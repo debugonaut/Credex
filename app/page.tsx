@@ -6,7 +6,7 @@ export default function Home() {
           StackTally
         </h1>
         <p className="text-xl text-gray-400 text-center max-w-2xl">
-          The first automated spend audit for your startup's AI infrastructure.
+          The first automated spend audit for your startup&apos;s AI infrastructure.
           Identify wasted seats, underutilized tiers, and better alternatives in seconds.
         </p>
         
