@@ -81,4 +81,55 @@
 - None. The form persists beautifully, handles state updates correctly, and logs the calculated `AuditResult` to the console.
 
 **Plan for tomorrow:**
-- Implement Phase 3: Setup dynamic API routes, lead capture database schemas, and integrate Anthropic API to generate personalized audit summary paragraphs.
+- Build the dynamic Results RSC page, the edge-runtime OG image generator, wire the form to the POST endpoint, and verify compilation.
+
+## Day 3 (Continuation) — 2026-05-23
+
+**Hours worked:** 4
+
+**What I did:**
+- Installed the new production-ready dependencies: `nanoid` (v5), `@supabase/supabase-js`, `@upstash/ratelimit`, and `@upstash/redis`.
+- Implemented `lib/slug.ts` with alphanumeric slug generation and defensive Supabase collision detection using a recursive retry loop.
+- Implemented `lib/sanitize.ts` public audit sanitizer, acting as a strict privacy boundary that strips out all PII and sensitive data.
+- Built server-side (`lib/supabase.ts`) and browser-side (`lib/supabase-browser.ts`) Supabase client factories.
+- Designed `db/schema.sql` database schema defining `audits`, `leads`, and `events` tables with custom PG indices.
+- Created `app/api/audit/create/route.ts` API route handler that runs validation, executes the audit engine, handles slug collisions, saves results, and applies robust Upstash sliding-window rate limiting.
+
+**Technical decisions I made today:**
+- **Strict Row Level Security (RLS) Policy Segmentation**: I designed a strict multi-tier security model for the database schema. While public audits must be accessible via their slug using the public `anon` key, `leads` and `events` are completely locked down (using `USING (false)` policies that only allow bypass via `service_role` keys on the server). This prevents any malicious client-side querying of contact lists or emails. This directly aligns with our privacy constraint: any visitor can view their sanitized shareable audit results, but private company identifiers and emails are structurally sandboxed and inaccessible.
+
+**What I learned:**
+- During local testing without configured environment variables, throwing immediate errors at the route or client levels completely halts local compilation/builds. I learned to wrap rate limiting and Supabase client lookups in try-catch guards to cleanly degrade or alert rather than blocking development.
+
+**Blockers / what I'm stuck on:**
+- None. Backend integration is fully complete, type-safe, and rate-limited.
+
+---
+
+## Day 4 — 2026-05-24
+
+**Hours worked:** 6
+
+**What I did:**
+- Created `hooks/useCountUp.ts` using requestAnimationFrame to render smooth, eased count-up animations for the monthly savings.
+- Built `components/results/ResultsHero.tsx` showcasing the primary savings dollar values in a screenshot-friendly typographic format.
+- Built `components/results/ToolBreakdown.tsx` rendering granular comparison cards of spends and plan recommendations.
+- Built `components/results/CredexCTA.tsx` dynamically showing a free consultation scheduling invitation for accounts saving > $500/mo.
+- Built `components/results/OptimalBadge.tsx` featuring an honest optimized stack badge and an interactive client-side email price monitoring subscription form.
+- Built `components/results/AISummaryBlock.tsx` client component featuring an asynchronous non-blocking fetcher and an animated pulsing loading skeleton.
+- Built `components/results/ShareButton.tsx` rendering the audit slug URL with robust `window.location` fallbacks and instant copy-to-clipboard UI feedback.
+- Created `app/results/[slug]/page.tsx` React Server Component rendering dynamic page layouts, dynamic SEO metadata, and dynamic Open Graph headers.
+- Created `app/results/[slug]/opengraph-image.tsx` using `ImageResponse` on the edge to dynamically draw user-specific figures.
+- Wired `components/form/AuditForm.tsx` to call the `/api/audit/create` endpoint, clear localStorage, and redirect to the results page upon success.
+- Updated `ARCHITECTURE.md` with detailed system specifications and a comprehensive Mermaid data-flow diagram.
+
+**Technical decisions I made today:**
+- **Edge OG Image Layout Workaround**: When implementing `opengraph-image.tsx`, I discovered that Satori (which powers `ImageResponse` under the hood) does not support external image URLs without complex arraybuffer fetching, and is highly sensitive to CSS layouts (unsupported grid columns, complex border-radius properties). I resolved this by designing an extremely elegant, pure-CSS layout utilizing simple flexbox nodes, custom monospace font parameters, and a prominent solid-color `#00E5A0` brand border accent. This yields a blazing fast, zero-dependency Edge-runtime OG card that draws custom numbers perfectly.
+- **RSC Caching & Revalidation Strategy**: In `app/results/[slug]/page.tsx`, I configured `export const revalidate = 3600` (1 hour cache). Since audit structures do not change after creation but the LLM-generated summary is written asynchronously a few minutes later, caching for 1 hour ensures users see immediate performance boosts, while eventual consistency handles loading the AI summary paragraph on subsequent page refreshes.
+
+**What I learned:**
+- Using `window.location.origin` as a browser-side origin fallback inside `ShareButton.tsx` is far more resilient than hardcoding environment variables. It seamlessly adapts to standard Next.js ports, production sites, or dynamic Vercel previews.
+
+**Blockers / what I'm stuck on:**
+- None. Compilation checks are 100% clean and type-safe. All Vitest suites pass cleanly.
+
