@@ -131,5 +131,5 @@
 - Using `window.location.origin` as a browser-side origin fallback inside `ShareButton.tsx` is far more resilient than hardcoding environment variables. It seamlessly adapts to standard Next.js ports, production sites, or dynamic Vercel previews.
 
 **Blockers / what I'm stuck on:**
-- None. Compilation checks are 100% clean and type-safe. All Vitest suites pass cleanly.
+- None. Compilation checks are 100% clean and type-safe. All Vitest suites pass cleanly. Added follow-up commits fixing strict ESLint warnings and type narrowing rules during Next.js production build checks to ensure a completely green CI status.
 
