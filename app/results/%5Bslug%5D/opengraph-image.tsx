@@ -9,8 +9,14 @@ interface Props {
   params: { slug: string }
 }
 
+interface AuditResultSummary {
+  totalMonthlySavingsCents: number
+  isAlreadyOptimal: boolean
+  recommendations: Array<{ toolId: string }>
+}
+
 export default async function OGImage({ params }: Props) {
-  let result: any = undefined
+  let result: AuditResultSummary | undefined = undefined
   
   try {
     const supabase = createServerSupabaseClient()

@@ -20,7 +20,7 @@ export function ShareButton({ slug }: ShareButtonProps) {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (error) {
+    } catch {
       // Fallback for browsers without clipboard API support
       try {
         const textarea = document.createElement('textarea')

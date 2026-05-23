@@ -8,6 +8,28 @@ import { CredexCTA } from '@/components/results/CredexCTA'
 import { OptimalBadge } from '@/components/results/OptimalBadge'
 import { AISummaryBlock } from '@/components/results/AISummaryBlock'
 import { ShareButton } from '@/components/results/ShareButton'
+import type { Recommendation, SavingsBreakdown } from '@/types'
+
+interface AuditRow {
+  id: string
+  slug: string
+  input: {
+    tools: Array<{ toolId: string; planId: string; seats: number; monthlySpendUSD: number }>
+    teamSize: number
+    primaryUseCase: string
+    submittedAt: string
+  }
+  result: {
+    recommendations: Recommendation[]
+    totalMonthlySavingsCents: number
+    totalAnnualSavingsCents: number
+    isAlreadyOptimal: boolean
+    triggersCredexCTA: boolean
+    savingsBreakdown: SavingsBreakdown[]
+  }
+  ai_summary: string | null
+  created_at: string
+}
 
 // Cache results pages for 1 hour
 // Audit results don't change after creation — but the AI summary
@@ -58,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
       },
     }
-  } catch (error) {
+  } catch {
     // If client initialization fails during pre-rendering, fallback to default metadata
     return {
       title: 'Spend Audit Results | StackTally',
@@ -68,7 +90,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ResultsPage({ params }: Props) {
-  let data: any = null
+  let data: AuditRow | null = null
   let devModeMissingEnv = false
 
   try {
@@ -82,12 +104,13 @@ export default async function ResultsPage({ params }: Props) {
     if (error || !row) {
       notFound()
     }
-    data = row
-  } catch (error: any) {
+    data = row as unknown as AuditRow
+  } catch (error) {
+    const err = error as Error
     // Handle lack of environment variables locally for high-quality developer experience
     if (
-      error.message?.includes('Missing SUPABASE_URL') ||
-      error.message?.includes('env')
+      err.message?.includes('Missing SUPABASE_URL') ||
+      err.message?.includes('env')
     ) {
       devModeMissingEnv = true
     } else {
@@ -96,7 +119,7 @@ export default async function ResultsPage({ params }: Props) {
   }
 
   // Developer-friendly guide when environment variables are not yet setup
-  if (devModeMissingEnv) {
+  if (devModeMissingEnv || !data) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#0A0A0B] p-6 text-white">
         <div className="max-w-md w-full bg-white/[0.02] border border-amber-500/30 p-8 rounded-2xl space-y-6">
@@ -132,7 +155,7 @@ export default async function ResultsPage({ params }: Props) {
     totalAnnualSavingsCents: number
     isAlreadyOptimal: boolean
     triggersCredexCTA: boolean
-    savingsBreakdown: any[]
+    savingsBreakdown: SavingsBreakdown[]
   }
 
   return (

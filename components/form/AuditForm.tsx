@@ -9,7 +9,6 @@ import { useFormPersistence } from '@/hooks/useFormPersistence'
 import { ToolSelector } from './ToolSelector'
 import { ToolCard } from './ToolCard'
 import { TeamContextFields } from './TeamContextFields'
-import { runAudit } from '@/engine'
 
 export function AuditForm() {
   const form = useForm<AuditInputSchema>({
@@ -62,7 +61,7 @@ export function AuditForm() {
 
       // Redirect to results page
       router.push(`/results/${slug}`)
-    } catch (err) {
+    } catch {
       setSubmitError('Network error. Please check your internet connection and try again.')
     } finally {
       setSubmitting(false)
