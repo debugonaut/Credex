@@ -95,38 +95,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to save. Please try again.' }, { status: 500 })
   }
 
-  // Send confirmation email
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://your-domain.com'
-  const resultsUrl = `${appUrl}/results/${slug}`
-  const htmlContent = AuditConfirmationEmail({
-    resultsUrl,
-    totalMonthlySavingsCents: result.totalMonthlySavingsCents,
-    isAlreadyOptimal: result.isAlreadyOptimal,
-  })
+  // Send confirmation email asynchronously — do not block the HTTP return payload
+  const sendEmailAsync = async () => {
+    try {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://your-domain.com'
+      const resultsUrl = `${appUrl}/results/${slug}`
+      const htmlContent = AuditConfirmationEmail({
+        resultsUrl,
+        totalMonthlySavingsCents: result.totalMonthlySavingsCents,
+        isAlreadyOptimal: result.isAlreadyOptimal,
+      })
 
-  try {
-    const resend = getResendClient()
-    await resend.emails.send({
-      from: process.env.EMAIL_FROM ?? 'onboarding@resend.dev',
-      to: email,
-      subject: result.isAlreadyOptimal
-        ? 'Your AI stack is already optimized'
-        : `You found $${(result.totalMonthlySavingsCents / 100).toFixed(0)}/mo in AI savings`,
-      html: htmlContent,
-    })
+      const resend = getResendClient()
+      await resend.emails.send({
+        from: process.env.EMAIL_FROM ?? 'onboarding@resend.dev',
+        to: email,
+        subject: result.isAlreadyOptimal
+          ? 'Your AI stack is already optimized'
+          : `You found $${(result.totalMonthlySavingsCents / 100).toFixed(0)}/mo in AI savings`,
+        html: htmlContent,
+      })
 
-    // Mark email as sent
-    await supabase
-      .from('leads')
-      .update({ email_sent: true })
-      .eq('audit_id', audit.id)
-      .eq('email', email)
+      // Use a new client instance for safety in asynchronous scope
+      const asyncSupabase = createServerSupabaseClient()
+      await asyncSupabase
+        .from('leads')
+        .update({ email_sent: true })
+        .eq('audit_id', audit.id)
+        .eq('email', email)
 
-  } catch (emailError) {
-    // Email failure is non-fatal — the lead is saved, we just didn't send the email
-    console.error('[lead/capture] Email send failed:', emailError)
-    // Do not return an error to the user — the lead is captured, that's what matters
+    } catch (emailError) {
+      console.error('[lead/capture] Background email send failed:', emailError)
+      // Capture failure in Sentry
+      const Sentry = await import('@sentry/nextjs')
+      Sentry.captureException(emailError)
+    }
   }
+
+  // Fire and forget background transactional email send
+  sendEmailAsync()
 
   // Log analytics event
   await supabase.from('events').insert({

@@ -896,3 +896,343 @@ cors({
 
 Security is not a feature. Reliability is not a feature. Maintainability is not a feature. These are the baseline cost of putting software in front of real users. Every shortcut taken here is a debt that will be repaid — usually at the worst possible moment, at scale, under pressure. Build it right from the start.
 
+RULE 25: THREAT MODELING AND ATTACK SURFACE ANALYSIS
+
+Core Principle: You cannot defend what you have not identified.
+
+Threat modeling requirements
+
+Every production system must document:
+
+Assets worth protecting
+Trust boundaries
+Threat actors
+Attack surfaces
+Entry points
+Privileged operations
+Failure modes
+Use STRIDE for threat analysis
+
+For every major component evaluate:
+
+Spoofing — impersonation risks
+Tampering — unauthorized modification risks
+Repudiation — lack of accountability/auditability
+Information Disclosure — data leakage risks
+Denial of Service — availability risks
+Elevation of Privilege — privilege escalation risks
+Required architectural artifacts
+Data flow diagrams
+Trust boundary maps
+External dependency inventory
+Third-party integration inventory
+Privileged operation map
+Sensitive data flow documentation
+Abuse case analysis
+
+Document:
+
+How users might abuse the system intentionally
+How attackers may chain features together
+Economic abuse vectors
+Automation abuse vectors
+AI prompt abuse vectors
+Threat modeling cadence
+During architecture design
+Before major releases
+After significant infrastructure changes
+After security incidents
+Quarterly minimum for critical systems
+RULE 26: SOFTWARE SUPPLY CHAIN SECURITY
+
+Core Principle: Your application is only as trustworthy as the software and artifacts it depends on.
+
+Dependency provenance
+Verify package authenticity before installation
+Prefer officially maintained packages
+Prefer signed releases when available
+Avoid abandoned or single-maintainer critical dependencies
+Artifact signing
+Sign production container images
+Sign release artifacts
+Verify signatures during deployment
+Use Sigstore/Cosign where possible
+SLSA compliance
+
+Aim for:
+
+Reproducible builds
+Verified source provenance
+Tamper-resistant CI pipelines
+Hermetic builds where possible
+SBOM (Software Bill of Materials)
+
+Generate SBOMs for every production build:
+
+CycloneDX or SPDX format
+Include all transitive dependencies
+Store alongside release artifacts
+Retain for incident response and compliance
+Registry security
+Use private registries for internal packages
+Restrict publish permissions
+Enable MFA on package registries
+Monitor for dependency confusion attacks
+Dependency confusion prevention
+Namespace internal packages clearly
+Pin internal registries explicitly
+Never install packages dynamically from user input
+Build environment isolation
+CI runners should be ephemeral
+No persistent credentials on runners
+Isolate production deployment credentials
+Prevent lateral movement between CI jobs
+RULE 27: CONTAINER AND KUBERNETES SECURITY
+
+Core Principle: Containers reduce attack surface only when hardened correctly.
+
+Container hardening
+Use minimal base images (distroless, alpine where appropriate)
+Never run containers as root
+Use read-only root filesystems where possible
+Drop unnecessary Linux capabilities
+Disable privileged containers
+Use seccomp and AppArmor profiles
+Scan images for vulnerabilities before deployment
+Image security
+Pin image versions explicitly
+Never use latest in production
+Sign container images
+Store images in trusted registries only
+Remove unused packages and tooling from runtime images
+Secret management
+Never bake secrets into images
+Mount secrets dynamically at runtime
+Rotate Kubernetes secrets regularly
+Use external secret operators where possible
+Kubernetes security
+Enable RBAC and least privilege service accounts
+Disable anonymous access
+Restrict pod-to-pod communication with network policies
+Use admission controllers to enforce policies
+Restrict hostPath mounts
+Restrict exec access into running containers
+Runtime protection
+Monitor for:
+unexpected process execution
+crypto mining behavior
+privilege escalation attempts
+filesystem tampering
+outbound connections to suspicious domains
+Multi-tenancy
+Separate namespaces by environment and trust level
+Production workloads isolated from staging/development
+Restrict cross-namespace access
+RULE 28: ADVANCED AI AGENT SECURITY
+
+Core Principle: AI agents are autonomous capability amplifiers. Constrain them aggressively.
+
+Tool execution isolation
+All tool execution must occur inside isolated sandboxes
+Use containerized or VM-isolated execution environments
+Never allow unrestricted filesystem access
+Never allow unrestricted network access
+Apply egress filtering to agent environments
+Permission boundaries
+Agents receive only task-specific permissions
+Agents must not self-modify permissions
+Agents must not generate or rotate credentials
+Agents must not access secrets outside explicit scope
+Human approval gates
+
+Require human approval for:
+
+Financial transactions
+Deletions
+External communications
+Infrastructure modifications
+Permission changes
+Production deployments
+Data exports
+RAG and vector database security
+Treat retrieved context as untrusted input
+Validate retrieval sources
+Prevent prompt injection through retrieval data
+Separate trusted and untrusted retrieval corpora
+Log retrieval provenance
+Memory poisoning prevention
+Long-term memory systems require validation before persistence
+Prevent users from injecting privileged instructions into memory
+Separate operational memory from user memory
+Allow memory revocation and auditing
+Prompt compartmentalization
+Separate:
+system prompts
+developer prompts
+tool instructions
+retrieved context
+user input
+Never concatenate all context blindly into a single prompt
+Output verification
+Critical outputs require deterministic validation
+AI-generated code must pass static analysis and tests before execution
+AI-generated infrastructure changes require policy validation
+AI-generated SQL or shell commands require allowlist validation
+Agent observability
+
+Log:
+
+tool usage
+prompt chains
+retrieval sources
+reasoning metadata where permissible
+action execution
+failures
+escalation attempts
+Multi-agent systems
+Agents must not trust outputs from other agents automatically
+Validate inter-agent communication
+Prevent cross-agent privilege escalation
+Scope context independently per agent
+RULE 29: SSRF, EGRESS CONTROL, AND NETWORK ISOLATION
+
+Core Principle: Outbound access is as dangerous as inbound access.
+
+SSRF prevention
+Never fetch arbitrary user-provided URLs directly
+Validate allowed domains explicitly
+Block access to:
+localhost
+internal IP ranges
+metadata endpoints
+cloud instance credentials endpoints
+Use allowlists for outbound destinations
+Egress controls
+Restrict outbound traffic at infrastructure level
+Explicitly allow only required destinations
+Monitor outbound traffic anomalies
+Prevent unrestricted internet access from internal workloads
+Metadata service protection
+Block cloud metadata endpoint access unless explicitly required
+Use IMDSv2 on AWS
+Restrict container access to instance metadata
+Internal network segmentation
+Separate:
+production
+staging
+development
+CI/CD
+admin systems
+Use private subnets for databases and internal services
+Never expose databases directly to the public internet
+RULE 30: FORMAL SECURITY OPERATIONS AND GOVERNANCE
+
+Core Principle: Security must become an organizational process, not just engineering advice.
+
+Vulnerability management
+Define SLA targets:
+Critical: fix within 24–72 hours
+High: within 7 days
+Medium: within 30 days
+Track remediation progress centrally
+Maintain vulnerability inventory
+Security reviews
+
+Mandatory reviews for:
+
+authentication systems
+payment systems
+AI agents
+infrastructure changes
+permission systems
+cryptography changes
+external integrations
+Penetration testing
+Annual minimum for production systems
+Quarterly for high-risk systems
+Include authenticated and unauthenticated testing
+Include AI-specific abuse testing
+Bug bounty and disclosure
+Maintain responsible disclosure process
+Provide security contact channel
+Define response timelines
+Track and remediate reported issues
+Security champions
+Assign security-aware engineers within teams
+Conduct regular security training
+Share incident learnings organization-wide
+Incident response
+
+Maintain documented procedures for:
+
+credential compromise
+ransomware
+data breach
+insider threats
+production compromise
+AI abuse incidents
+Postmortems
+
+After every major incident:
+
+document timeline
+identify root cause
+identify systemic failures
+define remediation actions
+track remediation completion
+avoid blame-oriented culture
+RULE 31: CRYPTOGRAPHIC SAFETY
+
+Core Principle: Cryptography fails catastrophically when implemented incorrectly.
+
+Approved cryptography
+
+Use only modern, vetted algorithms:
+
+AES-256-GCM
+ChaCha20-Poly1305
+RSA-2048+ or ECC equivalents
+Ed25519 for signing
+Never implement custom cryptography
+Never create custom encryption algorithms
+Never invent token formats
+Never design your own password hashing
+Use audited libraries only
+Key management
+Separate encryption keys by environment
+Rotate keys periodically
+Support key revocation
+Store master keys in KMS/HSM systems
+Limit access to decryption operations
+Randomness
+Use cryptographically secure random generators only
+Never use Math.random() for security-sensitive operations
+Session IDs, reset tokens, API keys, and nonces must use CSPRNGs
+Signing and verification
+Verify webhook signatures
+Verify JWT signatures and algorithms explicitly
+Reject unsigned or weakly signed tokens
+Never allow alg=none
+RULE 32: DATA CLASSIFICATION AND TRUST BOUNDARIES
+
+Core Principle: Not all data requires equal protection.
+
+Data classification
+
+Classify all stored data into categories:
+
+Public
+Internal
+Confidential
+Restricted
+Protection requirements
+Restricted data requires encryption at rest and in transit
+Access to restricted data must be audit logged
+Production access requires approval and MFA
+Trust boundaries
+
+Define and document boundaries between:
+
+user devices
+frontend
+API l
