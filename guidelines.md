@@ -896,4 +896,3 @@ cors({
 
 Security is not a feature. Reliability is not a feature. Maintainability is not a feature. These are the baseline cost of putting software in front of real users. Every shortcut taken here is a debt that will be repaid — usually at the worst possible moment, at scale, under pressure. Build it right from the start.
 
----
