@@ -33,6 +33,17 @@ export function AuditForm() {
   // Wire LocalStorage persistence — loads on mount, auto-saves on changes
   useFormPersistence(form.watch, form.reset)
 
+  // Fire form_started once when first tool is selected — marks funnel entry
+  React.useEffect(() => {
+    if (fields.length === 1) {
+      fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: null, eventType: 'form_started' }),
+      }).catch(() => {})
+    }
+  }, [fields.length])
+
   const onSubmit = async (data: AuditInputSchema) => {
     setSubmitting(true)
     setSubmitError(null)

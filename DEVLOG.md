@@ -133,3 +133,33 @@
 **Blockers / what I'm stuck on:**
 - None. Compilation checks are 100% clean and type-safe. All Vitest suites pass cleanly. Added follow-up commits fixing strict ESLint warnings and type narrowing rules during Next.js production build checks to ensure a completely green CI status.
 
+---
+
+## Day 5 — 2026-05-25
+
+**Hours worked:** 5
+
+**What I did:**
+- Installed production dependencies `@anthropic-ai/sdk` and `resend` using pnpm.
+- Implemented `lib/anthropic.ts` providing a lazy-loaded singleton Anthropic client and `generateAuditSummary` with a strict 10-second timeout.
+- Implemented `prompts/auditSummary.ts` with structured template instructions and `FALLBACK_SUMMARY_TEMPLATE` to render beautiful, natural, zero-hallucination backup paragraphs.
+- Implemented idempotent `app/api/summary/route.ts` API route that generates and stores AI summaries in Supabase.
+- Implemented `lib/resend.ts` and `emails/AuditConfirmation.tsx` transactional HTML templates confirming the audit results.
+- Implemented the highly protected `app/api/lead/capture/route.ts` API endpoint, inserting leads into Supabase, sending transactional confirmation emails, and logging funnel analytics.
+- Built `components/results/LeadCaptureModal.tsx` slide-up modal with dynamic inputs (company/role) restricted to high-value leads.
+- Mounted `LeadCaptureModal` at the bottom of the results page container (`app/results/[slug]/page.tsx`).
+- Created a server-side `lib/analytics.ts` log helper and `app/api/events/route.ts` client API proxy to securely write analytical funnel events.
+- Wired conversion funnel events throughout the app: `form_started` in `AuditForm.tsx` (on first tool selection), `link_shared` in `ShareButton.tsx` (on copy success), and `cta_clicked` in `CredexCTA.tsx` (on booking click).
+- Fully authored `METRICS.md` with conversion targets, unit economics per audit, and a $1M ARR pathway.
+- Fully authored `PROMPTS.md` documenting prompt engineering iterations, model choice (Haiku vs Sonnet), and fallback systems.
+
+**Technical decisions I made today:**
+- **Asynchronous & Idempotent AI Summaries**: I decided to trigger the AI summary generation asynchronously via `/api/summary` from the client after page load rather than blocking the React Server Component (RSC) on the Anthropic API call. Blocking the RSC would degrade our Largest Contentful Paint (LCP) and cause the page load to be sluggish. By rendering the results page immediately, users see their total savings instantly, while a pure CSS skeleton animates until the AI summary resolves. We also enforce server-side idempotency: if a summary is already generated, we return the cached record rather than invoking Claude, preventing duplicated API billing.
+- **Strict 10-Second Claude Timeout**: Enforced a strict 10-second timeout on the Anthropic call via `AbortController`. In high-volume production environments, letting an external API call hang indefinitely blocks database connections and route workers. If the call times out or fails, we catch the error and fallback to our local template (`FALLBACK_SUMMARY_TEMPLATE`), which translates the exact audit inputs and recommendations into a beautifully structured natural-language summary that is visually indistinguishable to the end-user.
+- **Lead Capture UX Delay & Friction Reduction**: Inside `LeadCaptureModal.tsx`, I set an intentional 3-second delay instead of showing the modal on page load. Interrupting users immediately before they have had time to digest their savings results yields massive drop-offs. Waiting 3 seconds gives them time to experience the "wow" factor, dramatically boosting email capture conversion rates. Additionally, we only collect `companyName` and `role` fields for high-value leads (`triggersCredexCTA = true`). Low-value leads only see the single `email` field, reducing data collection friction where warm enterprise outreach isn't justified.
+- **Sandbox Resend Friction Mitigation**: During local email verification testing, we hit the standard sandbox restriction where Resend only allows sending to the registered developer email address until a custom domain is verified. I mitigated this by writing a robust fallback `process.env.EMAIL_FROM ?? 'onboarding@resend.dev'` in our capture API so that local testing runs smoothly in sandbox mode, and updated the `.env.local` templates so the transition to custom domains in production is single-line.
+
+**Blockers / what I'm stuck on:**
+- None. Full compilation checks are 100% clean. The end-to-end flow from form selection -> `/api/audit/create` -> `/results/[slug]` -> `/api/summary` -> `/api/lead/capture` is fully verified, type-safe, and passing build runs.
+
+

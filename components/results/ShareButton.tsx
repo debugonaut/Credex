@@ -15,11 +15,20 @@ export function ShareButton({ slug }: ShareButtonProps) {
     : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
   const shareUrl = `${origin}/results/${slug}`
 
+  const logSharedEvent = async () => {
+    await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, eventType: 'link_shared' }),
+    }).catch(() => {})
+  }
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+      logSharedEvent()
     } catch {
       // Fallback for browsers without clipboard API support
       try {
@@ -34,6 +43,7 @@ export function ShareButton({ slug }: ShareButtonProps) {
         document.body.removeChild(textarea)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
+        logSharedEvent()
       } catch (fallbackError) {
         console.error('Failed to copy to clipboard:', fallbackError)
       }

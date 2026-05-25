@@ -8,6 +8,7 @@ import { CredexCTA } from '@/components/results/CredexCTA'
 import { OptimalBadge } from '@/components/results/OptimalBadge'
 import { AISummaryBlock } from '@/components/results/AISummaryBlock'
 import { ShareButton } from '@/components/results/ShareButton'
+import { LeadCaptureModal } from '@/components/results/LeadCaptureModal'
 import type { Recommendation, SavingsBreakdown } from '@/types'
 
 interface AuditRow {
@@ -189,7 +190,7 @@ export default async function ResultsPage({ params }: Props) {
 
         {/* Credex CTA — only for high-savings audits */}
         {result.triggersCredexCTA && !result.isAlreadyOptimal && (
-          <CredexCTA totalMonthlySavingsCents={result.totalMonthlySavingsCents} />
+          <CredexCTA slug={params.slug} totalMonthlySavingsCents={result.totalMonthlySavingsCents} />
         )}
 
         {/* Share section */}
@@ -204,6 +205,14 @@ export default async function ResultsPage({ params }: Props) {
           </div>
           <ShareButton slug={params.slug} />
         </section>
+
+        {/* Lead capture modal */}
+        <LeadCaptureModal
+          slug={params.slug}
+          totalMonthlySavingsCents={result.totalMonthlySavingsCents}
+          isAlreadyOptimal={result.isAlreadyOptimal}
+          triggersCredexCTA={result.triggersCredexCTA}
+        />
       </div>
     </main>
   )

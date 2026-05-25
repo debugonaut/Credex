@@ -1,14 +1,23 @@
 interface CredexCTAProps {
+  slug: string
   totalMonthlySavingsCents: number
 }
 
-export function CredexCTA({ totalMonthlySavingsCents }: CredexCTAProps) {
+export function CredexCTA({ slug, totalMonthlySavingsCents }: CredexCTAProps) {
   const savingsDollars = (totalMonthlySavingsCents / 100).toLocaleString('en-US', {
     maximumFractionDigits: 0,
   })
   const annualDollars = ((totalMonthlySavingsCents * 12) / 100).toLocaleString('en-US', {
     maximumFractionDigits: 0,
   })
+
+  const handleCtaClick = async () => {
+    await fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, eventType: 'cta_clicked' }),
+    }).catch(() => {})
+  }
 
   return (
     <aside
@@ -47,6 +56,7 @@ export function CredexCTA({ totalMonthlySavingsCents }: CredexCTAProps) {
           href="https://credex.rocks"
           target="_blank"
           rel="noopener noreferrer"
+          onClick={handleCtaClick}
           className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center"
           style={{ backgroundColor: '#00E5A0', color: '#0A0A0B' }}
         >
