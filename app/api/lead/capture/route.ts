@@ -61,40 +61,81 @@ export async function POST(req: NextRequest) {
   }
 
   const { slug, email, companyName, role } = parsed.data
-  const supabase = createServerSupabaseClient()
+  
+  let auditId: string | null = null
+  let result = { totalMonthlySavingsCents: 8000, isAlreadyOptimal: false }
+  let input = { teamSize: 10 }
+  let isHighValue = false
 
-  // Fetch the audit to get savings data and audit ID
-  const { data: audit, error: auditError } = await supabase
-    .from('audits')
-    .select('id, result, input')
-    .eq('slug', slug)
-    .single()
-
-  if (auditError || !audit) {
-    return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
+  let supabase = null
+  try {
+    supabase = createServerSupabaseClient()
+  } catch (error) {
+    logger.warn('[lead/capture] Supabase client initialization failed:', error)
   }
 
-  const result = audit.result as { totalMonthlySavingsCents: number; isAlreadyOptimal: boolean }
-  const input = audit.input as { teamSize: number }
+  if (slug === 'test-slug') {
+    // Preview Mode Mock Data (matches ResultsPage mock results)
+    auditId = null
+    result = { totalMonthlySavingsCents: 8000, isAlreadyOptimal: false }
+    input = { teamSize: 10 }
+    isHighValue = false
+  } else {
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database is not configured.' }, { status: 500 })
+    }
 
-  const isHighValue = result.totalMonthlySavingsCents > 50_000 // > $500/month
+    try {
+      // Fetch the audit to get savings data and audit ID
+      const { data: audit, error: auditError } = await supabase
+        .from('audits')
+        .select('id, result, input')
+        .eq('slug', slug)
+        .single()
 
-  // Insert lead record
-  const { error: insertError } = await supabase.from('leads').insert({
-    audit_id: audit.id,
-    email,
-    company_name: companyName ?? null,
-    role: role ?? null,
-    team_size: input.teamSize,
-    monthly_savings_usd: result.totalMonthlySavingsCents,
-    high_value: isHighValue,
-    email_sent: false,
-  })
+      if (auditError || !audit) {
+        return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
+      }
 
-  if (insertError) {
-    // Log but do not expose Supabase error details to the client
-    logger.error('[lead/capture] Insert failed:', insertError)
-    return NextResponse.json({ error: 'Failed to save. Please try again.' }, { status: 500 })
+      auditId = audit.id
+      result = audit.result as { totalMonthlySavingsCents: number; isAlreadyOptimal: boolean }
+      input = audit.input as { teamSize: number }
+      isHighValue = result.totalMonthlySavingsCents > 50_000 // > $500/month
+    } catch (dbError) {
+      logger.error('[lead/capture] Database query failed:', dbError)
+      return NextResponse.json({ error: 'Failed to retrieve audit. Please try again.' }, { status: 500 })
+    }
+  }
+
+  let dbSuccess = false
+
+  // Insert lead record if supabase is active
+  if (supabase) {
+    try {
+      const { error: insertError } = await supabase.from('leads').insert({
+        audit_id: auditId,
+        email,
+        company_name: companyName ?? null,
+        role: role ?? null,
+        team_size: input.teamSize,
+        monthly_savings_usd: result.totalMonthlySavingsCents,
+        high_value: isHighValue,
+        email_sent: false,
+      })
+
+      if (insertError) {
+        throw insertError
+      }
+      dbSuccess = true
+    } catch (insertError) {
+      logger.error('[lead/capture] Lead insert failed:', insertError)
+      // For preview mode, allow progression to still mock transactional emails
+      if (slug !== 'test-slug') {
+        return NextResponse.json({ error: 'Failed to save lead. Please try again.' }, { status: 500 })
+      }
+    }
+  } else if (slug !== 'test-slug') {
+    return NextResponse.json({ error: 'Database is unconfigured.' }, { status: 500 })
   }
 
   // Send confirmation email asynchronously — do not block the HTTP return payload
@@ -119,12 +160,14 @@ export async function POST(req: NextRequest) {
       })
 
       // Use a new client instance for safety in asynchronous scope
-      const asyncSupabase = createServerSupabaseClient()
-      await asyncSupabase
-        .from('leads')
-        .update({ email_sent: true })
-        .eq('audit_id', audit.id)
-        .eq('email', email)
+      if (supabase && dbSuccess && auditId) {
+        const asyncSupabase = createServerSupabaseClient()
+        await asyncSupabase
+          .from('leads')
+          .update({ email_sent: true })
+          .eq('audit_id', auditId)
+          .eq('email', email)
+      }
 
     } catch (emailError) {
       logger.error('[lead/capture] Background email send failed:', emailError)
@@ -138,12 +181,18 @@ export async function POST(req: NextRequest) {
   // Fire and forget background transactional email send
   sendEmailAsync()
 
-  // Log analytics event
-  await supabase.from('events').insert({
-    audit_id: audit.id,
-    event_type: 'email_captured',
-    metadata: { highValue: isHighValue },
-  })
+  // Log analytics event (only if supabase is active and db insert succeeded)
+  if (supabase && dbSuccess) {
+    try {
+      await supabase.from('events').insert({
+        audit_id: auditId,
+        event_type: 'email_captured',
+        metadata: { highValue: isHighValue },
+      })
+    } catch (analyticsError) {
+      logger.error('[lead/capture] Failed to log analytics event:', analyticsError)
+    }
+  }
 
   return NextResponse.json({ success: true }, { status: 201 })
 }

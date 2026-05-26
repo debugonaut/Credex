@@ -49,8 +49,16 @@ export function LeadCaptureModal({
       })
 
       if (!res.ok) {
-        const data = await res.json() as { error?: string }
-        setError(data.error ?? 'Something went wrong. Try again.')
+        let errorMessage = 'Something went wrong. Try again.'
+        try {
+          const data = await res.json() as { error?: string }
+          if (data?.error) {
+            errorMessage = data.error
+          }
+        } catch {
+          errorMessage = `Server error (${res.status}). Please try again.`
+        }
+        setError(errorMessage)
         return
       }
 
