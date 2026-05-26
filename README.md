@@ -6,7 +6,7 @@ StackTally analyzes your team's AI tool subscriptions — Cursor, GitHub Copilot
 
 ## Live Demo
 
-> **URL:** [Coming soon — deployed on Vercel]
+> **URL:** [https://stacktally-audit.vercel.app](https://stacktally-audit.vercel.app)
 
 ## Tech Stack
 
@@ -60,6 +60,21 @@ All documentation files are at the repository root per the assignment specificat
 - `USER_INTERVIEWS.md` — Three user interview notes
 - `LANDING_COPY.md` — Landing page copy and FAQ
 - `METRICS.md` — Key performance metrics
+
+## Key Architectural Decisions
+
+We documented five critical technical trade-offs made during the engineering of the StackTally platform:
+
+1. **Integer Cents Math (Precision):**
+   We calculate and store all financial values in integer cents rather than standard JavaScript floats. Floating-point arithmetic on dynamic currencies causes rounding issues (e.g. `0.1 + 0.2 === 0.30000000000000004`) which destroys billing and financial credibility. Integer math remains 100% exact across all aggregations.
+2. **React Server Components (RSC) for dynamic reports:**
+   The results page routes (`/results/[slug]`) are rendered entirely on the server-side as dynamic Server Components, stripping out all `'use client'` segments from display widgets. This completely eliminated unnecessary browser bundle sizes and enabled dynamic Open Graph images to render instantly at the edge on first request, driving viral loops.
+3. **Zero-JS Event Telemetry (Redirect Proxy):**
+   Instead of using browser-side click handlers that dispatch dynamic async fetch requests to log analytics, we converted consultation CTAs to pure server components and routed button links directly to a backend telemetry redirect proxy: `/api/cta-redirect`. This endpoint registers the database analytical event server-side and redirects the browser seamlessly, eliminating 12KB of JavaScript payload.
+4. **Serverless-compatible Rate Limiting:**
+   Next.js App Router routes execute on stateless serverless functions, which means standard in-memory caching resets on cold starts. We implemented distributed, sliding-window rate limiting using `@upstash/ratelimit` backed by Redis to preserve state across multiple container runs.
+5. **Rigid TypeScript Compiler Safeguards:**
+   We fully activated `strict`, `noUncheckedIndexedAccess`, and `exactOptionalPropertyTypes` inside `tsconfig.json`. This forces compile-time handling of potentially `undefined` nested properties (such as pricing lookups), eliminating standard dynamic runtime crashes in production.
 
 ## License
 
