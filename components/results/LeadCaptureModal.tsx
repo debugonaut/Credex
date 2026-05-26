@@ -22,6 +22,7 @@ export function LeadCaptureModal({
   const [email, setEmail] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [role, setRole] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
 
   // Delay before showing — let users read their results first
   useEffect(() => {
@@ -83,10 +84,10 @@ export function LeadCaptureModal({
     : `Get your full savings report`
 
   const body = isAlreadyOptimal
-    ? 'AI tool pricing changes frequently. We\'ll email you when a better plan becomes available for your stack.'
+    ? 'AI tool pricing changes frequently. We\'ll alert you when a better plan becomes available for your stack.'
     : triggersCredexCTA
-    ? `We'll send you this audit and connect you with Credex to access discounted credits — estimated $${savingsDollars}/month back.`
-    : `We'll email you this audit so you can share it with your team or revisit it later.`
+    ? `Save your audit link and connect with Credex to access discounted credits — estimated $${savingsDollars}/month back.`
+    : `Save your shareable audit link to revisit or share with your team.`
 
   return (
     <div
@@ -100,24 +101,33 @@ export function LeadCaptureModal({
         className="w-full sm:max-w-md bg-white border-4 border-black p-8 relative rounded-none shadow-none animate-fade-in"
       >
         {submitted ? (
-          <div className="text-center py-4 space-y-6">
+          <div className="py-4 space-y-6">
             <div
               className="inline-flex items-center justify-center p-1 border border-black"
               aria-hidden="true"
             >
               <div className="border border-black bg-black text-white px-4 py-2 font-mono text-xs uppercase tracking-widest font-bold">
-                ✓ Verified
+                ✓ Saved
               </div>
             </div>
             <div>
-              <h2 className="text-black font-serif font-bold text-2xl">Check your inbox</h2>
+              <h2 className="text-black font-serif font-bold text-2xl">Your audit is saved</h2>
               <p className="text-text-secondary text-sm mt-3 leading-relaxed font-serif">
-                We&apos;ve sent your audit results to <strong className="text-black font-mono text-xs">{email}</strong>.
+                Copy this link to revisit or share with your team — no login required.
               </p>
             </div>
             <button
+              onClick={() => {
+                const url = typeof window !== 'undefined' ? window.location.href : ''
+                navigator.clipboard.writeText(url).then(() => setLinkCopied(true))
+              }}
+              className="w-full border-2 border-black text-black hover:bg-black hover:text-white py-3 text-xs font-mono uppercase tracking-widest font-bold transition-all duration-100 rounded-none cursor-pointer text-center"
+            >
+              {linkCopied ? '✓ Link copied!' : 'Copy shareable link'}
+            </button>
+            <button
               onClick={() => setVisible(false)}
-              className="mt-6 text-black hover:underline text-xs font-mono uppercase tracking-widest font-bold transition-colors cursor-pointer"
+              className="w-full text-black hover:underline text-xs font-mono uppercase tracking-widest font-bold transition-colors cursor-pointer text-center"
             >
               Back to results
             </button>
