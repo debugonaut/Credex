@@ -5,6 +5,7 @@ import { generateUniqueSlug } from '@/lib/slug'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
+import { logger } from '@/lib/logger'
 
 // Rate limiting: 5 audit submissions per IP per hour.
 // We defensively initialize Upstash Redis to ensure the build and local development
@@ -19,7 +20,7 @@ try {
     })
   }
 } catch (error) {
-  console.warn('[audit/create] Upstash rate limiting initialization failed/skipped:', error)
+  logger.warn('[audit/create] Upstash rate limiting initialization failed/skipped:', error)
 }
 
 export async function POST(req: NextRequest) {
@@ -35,9 +36,10 @@ export async function POST(req: NextRequest) {
         )
       }
     } catch (error) {
-      console.error('[audit/create] Rate limiting check failed:', error)
+      logger.error('[audit/create] Rate limiting check failed:', error)
     }
   }
+
 
   // Step 2: Parse and validate request body
   let body: unknown
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
   try {
     slug = await generateUniqueSlug()
   } catch (error) {
-    console.error('[audit/create] Slug generation failed:', error)
+    logger.error('[audit/create] Slug generation failed:', error)
     return NextResponse.json(
       { error: 'Failed to create audit. Please try again.' },
       { status: 500 }
@@ -83,7 +85,7 @@ export async function POST(req: NextRequest) {
   })
 
   if (insertError) {
-    console.error('[audit/create] Supabase insert failed:', insertError)
+    logger.error('[audit/create] Supabase insert failed:', insertError)
     return NextResponse.json(
       { error: 'Failed to save audit. Please try again.' },
       { status: 500 }
@@ -102,8 +104,9 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     // Analytics logging failure should not fail the user-facing request
-    console.error('[audit/create] Failed to log analytics event:', error)
+    logger.error('[audit/create] Failed to log analytics event:', error)
   }
+
 
   // Step 7: Return slug — client redirects to /results/[slug]
   return NextResponse.json({ slug }, { status: 201 })

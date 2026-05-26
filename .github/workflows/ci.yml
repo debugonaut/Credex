@@ -23,3 +23,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm tsc --noEmit
+      - name: Run Lighthouse CI
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LHCI_BASE_URL: ${{ secrets.VERCEL_PREVIEW_URL }}
+          LHCI_TEST_SLUG: ${{ secrets.LHCI_TEST_SLUG }}
+        run: |
+          pnpm lhci autorun
+

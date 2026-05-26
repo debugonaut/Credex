@@ -23,7 +23,7 @@ export function ToolSelector({ fields, append, remove }: ToolSelectorProps) {
       append({
         toolId,
         planId: defaultPlanId,
-        seats: config?.isApiOnly ? 1 : 1,
+        seats: 1,
         monthlySpendUSD: 0,
       })
     }
@@ -32,10 +32,13 @@ export function ToolSelector({ fields, append, remove }: ToolSelectorProps) {
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight text-white">
+        <h2 className="text-base font-semibold tracking-tight text-white">
           1. Select the AI Tools in your Stack
         </h2>
-        <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-[#18181B] text-gray-400 border border-[#27272A]">
+        <span
+          className="text-xs font-mono px-2.5 py-1 rounded-sm bg-bg-elevated text-text-secondary border border-border"
+          aria-live="polite"
+        >
           {fields.length} {fields.length === 1 ? 'tool' : 'tools'} selected
         </span>
       </div>
@@ -48,24 +51,28 @@ export function ToolSelector({ fields, append, remove }: ToolSelectorProps) {
               key={tool.toolId}
               type="button"
               onClick={() => handleToggle(tool.toolId)}
-              className={`group relative flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all duration-300 ${
+              aria-pressed={isSelected}
+              aria-label={`Toggle ${tool.displayName} in your stack selection`}
+              className="px-4 py-2 rounded-sm text-sm font-medium border transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-0.5"
+              style={
                 isSelected
-                  ? 'bg-[#00E5A0]/5 border-[#00E5A0] shadow-[0_0_15px_rgba(0,229,160,0.1)]'
-                  : 'bg-[#121214] border-[#27272A] hover:border-gray-500 hover:bg-[#161619]'
-              }`}
+                  ? {
+                      borderColor: 'var(--color-accent)',
+                      backgroundColor: 'rgba(0, 229, 160, 0.08)',
+                      color: 'var(--color-accent)',
+                    }
+                  : {
+                      borderColor: 'var(--color-border)',
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text-secondary)',
+                    }
+              }
             >
-              {/* Micro-glow effect on active state */}
-              {isSelected && (
-                <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-tr from-[#00E5A0]/10 to-transparent blur-md opacity-70" />
-              )}
-              
-              <span className={`text-sm font-medium transition-colors ${
-                isSelected ? 'text-[#00E5A0]' : 'text-gray-300 group-hover:text-white'
-              }`}>
+              <span className="font-semibold text-xs sm:text-sm">
                 {tool.displayName}
               </span>
-              <span className="mt-1 text-[10px] text-gray-500 group-hover:text-gray-400 line-clamp-1">
-                {tool.isApiOnly ? 'API-only' : `${tool.plans.length} tiers`}
+              <span className="text-[9px] opacity-75 font-mono">
+                {tool.isApiOnly ? 'API' : `${tool.plans.length} tiers`}
               </span>
             </button>
           )

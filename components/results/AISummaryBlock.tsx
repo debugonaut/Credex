@@ -41,15 +41,15 @@ export function AISummaryBlock({ slug, initialSummary }: AISummaryBlockProps) {
   if (loading) {
     return (
       <div aria-label="Generating AI summary" aria-busy="true" className="w-full space-y-4">
-        <h2 className="text-xs font-mono uppercase tracking-widest text-gray-500 mb-2 font-semibold">
+        <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-2 font-semibold">
           AI Analysis Summary
         </h2>
-        {/* Three-line skeleton — pure CSS animation, no library */}
+        {/* Three-line skeleton shimmer — pure CSS animation */}
         <div className="space-y-3">
           {[100, 92, 78].map((width, i) => (
             <div
               key={i}
-              className="h-4 rounded animate-pulse bg-white/[0.08]"
+              className="h-4 rounded skeleton-shimmer"
               style={{ width: `${width}%` }}
               aria-hidden="true"
             />
@@ -62,11 +62,11 @@ export function AISummaryBlock({ slug, initialSummary }: AISummaryBlockProps) {
   if (!summary) return null // failed silently — don't show anything broken
 
   return (
-    <section aria-label="AI-generated audit summary" className="w-full space-y-3 animate-fade-in">
-      <h2 className="text-xs font-mono uppercase tracking-widest text-gray-500 font-semibold">
-        AI Analysis Summary
+    <section aria-label="AI-generated audit summary" className="w-full space-y-3 animate-fade-slide-up">
+      <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted font-semibold">
+        AI Analysis
       </h2>
-      <p className="text-base text-gray-300 leading-relaxed font-sans">{summary}</p>
+      <p className="text-base text-text-secondary leading-relaxed font-sans">{summary}</p>
     </section>
   )
 }

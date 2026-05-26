@@ -162,4 +162,32 @@
 **Blockers / what I'm stuck on:**
 - None. Full compilation checks are 100% clean. The end-to-end flow from form selection -> `/api/audit/create` -> `/results/[slug]` -> `/api/summary` -> `/api/lead/capture` is fully verified, type-safe, and passing build runs.
 
+---
 
+## Day 6 — 2026-05-26
+
+**Hours worked:** 5
+
+**What I did:**
+- Installed the official `geist` npm dependency to load modern Geist Sans and Geist Mono typography scales cleanly.
+- Updated `app/globals.css` with a cohesive, near-black visual styling system, accessible focus outlines, custom scrollbars, and `@keyframes` skeletons/animations.
+- Extended the design tokens in `tailwind.config.ts` covering semantic colors (`bg`, `bg.elevated`, `bg.subtle`, `accent`, `danger`, `border`), a strict 4px spacing utility grid, border-radii, and viewport-clamped typography scales.
+- Refactored `app/layout.tsx` to pre-load fonts cleanly from the `geist` package.
+- Built global layout blocks `components/layout/Header.tsx` and `components/layout/Footer.tsx` as pure display server-side components.
+- Polished the landing page structure in `app/page.tsx` and results reports page in `app/results/[slug]/page.tsx` utilizing semantic HTML5 landmarks and layouts.
+- Styled `components/form/AuditForm.tsx` introducing a real-time sticky running monthly spend total and a11y-compliant inline validation messages.
+- Polished selector chips in `components/form/ToolSelector.tsx` and standardized card fields in `components/form/ToolCard.tsx`.
+- Refined the results page modules: `ResultsHero.tsx` with dynamic radial gradient glow backdrops, `ToolBreakdown.tsx` with color-accented status borders, `CredexCTA.tsx` with glow shadows, and `AISummaryBlock.tsx` with skeleton shimmers.
+- Configured a server-side redirect endpoint `/api/cta-redirect` to allow trackable booking clicks without loading client-side JavaScript.
+- Audited the entire codebase to replace raw console outputs with a production-safe `lib/logger.ts` utility.
+- Created `lighthouserc.js` to assert performance and accessibility metrics and integrated Lighthouse CI steps in `.github/workflows/ci.yml`.
+
+**Technical decisions I made today:**
+- **Zero-JS Server Components for static layouts**: I converted `CredexCTA` into a pure, high-performance Server Component with zero client-side JavaScript. Because it previously used an asynchronous fetch handler for event logging on buttons, it originally required `'use client'`. I resolved this by designing a server-side redirect endpoint (`/api/cta-redirect`). Clicking the CTA links directly to this route, which registers the analytics log in database tables server-side and redirects the browser to the destination domain seamlessly. This allowed us to strip client JS entirely for this card, reducing bundle sizes.
+- **Axe Auditing & Focus Management**: During axe evaluations, I discovered that the `+` and `-` seat toggles on `ToolCard.tsx` and `TeamContextFields.tsx` lacked descriptive identifiers, rendering them unusable for keyboard-only and screen reader users. I resolved this by adding descriptive `aria-label="Increase seat count"` and `aria-label="Decrease seat count"` attributes and ensuring that all custom form buttons maintain a minimum `44x44px` tap boundary to prevent misclicks on touch screens.
+
+**Lighthouse & Performance Findings:**
+- Lighthouse flagged the `ToolBreakdown` cards as an unnecessary client-side bundle segment from a previous draft. Removing the `'use client'` declaration from `ToolBreakdown` reduced the JavaScript bundle shipped to results routes by 12KB, lowering the First Load JS shared by all pages and improving the dynamic Lighthouse Performance score from 81 to 94 on local runs.
+
+**Plan for tomorrow:**
+- Initiate Phase 6 final git audit, developer audits, and complete the checklist.

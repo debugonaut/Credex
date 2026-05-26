@@ -296,18 +296,21 @@ export const PRICING_CONFIGS: PricingConfig[] = [
   },
 ]
 
+import { logger } from '@/lib/logger'
+
 // Add a dev-time warning for stale pricing data
 if (process.env.NODE_ENV === 'development') {
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
   PRICING_CONFIGS.forEach(config => {
     if (new Date(config.verifiedAt) < thirtyDaysAgo) {
-      console.warn(
+      logger.warn(
         `[pricing] Stale data for ${config.displayName} — verified ${config.verifiedAt}. Update PRICING_DATA.md.`
       )
     }
   })
 }
+
 
 // Primary lookup helper
 export function getPricingConfig(

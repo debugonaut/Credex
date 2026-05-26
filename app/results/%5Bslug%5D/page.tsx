@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { sanitizeAuditForPublic } from '@/lib/sanitize'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 import { ResultsHero } from '@/components/results/ResultsHero'
 import { ToolBreakdown } from '@/components/results/ToolBreakdown'
 import { CredexCTA } from '@/components/results/CredexCTA'
@@ -160,60 +162,82 @@ export default async function ResultsPage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#0A0A0B' }}>
-      <div className="max-w-2xl mx-auto px-4 py-20 space-y-16">
-        {/* Hero: big savings number or optimal badge */}
-        {result.isAlreadyOptimal ? (
-          <OptimalBadge />
-        ) : (
-          <ResultsHero
+    <>
+      <Header />
+      <main className="min-h-screen bg-bg">
+        <div className="max-w-2xl mx-auto px-4 py-16 space-y-12 sm:space-y-20">
+          {/* Visually hidden semantic h1 tag for screen readers & SEO mapping */}
+          <h1 className="sr-only">
+            {result.isAlreadyOptimal
+              ? 'AI Spend Audit: Your stack is well-optimized'
+              : `AI Spend Audit: $${(result.totalMonthlySavingsCents / 100).toFixed(0)}/month in potential savings found`
+            }
+          </h1>
+
+          {/* Hero: big savings number or optimal badge */}
+          {result.isAlreadyOptimal ? (
+            <OptimalBadge />
+          ) : (
+            <ResultsHero
+              totalMonthlySavingsCents={result.totalMonthlySavingsCents}
+              totalAnnualSavingsCents={result.totalAnnualSavingsCents}
+              isAlreadyOptimal={result.isAlreadyOptimal}
+              toolCount={audit.tools.length}
+            />
+          )}
+
+          <hr className="border-border" />
+
+          {/* AI summary — client component, loads async */}
+          <AISummaryBlock
+            slug={params.slug}
+            initialSummary={audit.aiSummary}
+          />
+
+          {/* Per-tool breakdown cards */}
+          {!result.isAlreadyOptimal && (
+            <>
+              <hr className="border-border" />
+              <ToolBreakdown
+                recommendations={result.recommendations}
+                savingsBreakdown={result.savingsBreakdown}
+              />
+            </>
+          )}
+
+          {/* Credex CTA — only for high-savings audits */}
+          {result.triggersCredexCTA && !result.isAlreadyOptimal && (
+            <>
+              <hr className="border-border" />
+              <CredexCTA slug={params.slug} totalMonthlySavingsCents={result.totalMonthlySavingsCents} />
+            </>
+          )}
+
+          <hr className="border-border" />
+
+          {/* Share section */}
+          <section aria-label="Share your audit" className="w-full space-y-4 pt-4">
+            <div>
+              <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted font-semibold mb-1">
+                Share This Audit
+              </h2>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                This secure link displays your optimization recommendations without exposing any email addresses, team parameters, or actual spending amounts. Safe to share with teammates, executives, or social media.
+              </p>
+            </div>
+            <ShareButton slug={params.slug} />
+          </section>
+
+          {/* Lead capture modal */}
+          <LeadCaptureModal
+            slug={params.slug}
             totalMonthlySavingsCents={result.totalMonthlySavingsCents}
-            totalAnnualSavingsCents={result.totalAnnualSavingsCents}
             isAlreadyOptimal={result.isAlreadyOptimal}
-            toolCount={audit.tools.length}
+            triggersCredexCTA={result.triggersCredexCTA}
           />
-        )}
-
-        {/* AI summary — client component, loads async */}
-        <AISummaryBlock
-          slug={params.slug}
-          initialSummary={audit.aiSummary}
-        />
-
-        {/* Per-tool breakdown cards */}
-        {!result.isAlreadyOptimal && (
-          <ToolBreakdown
-            recommendations={result.recommendations}
-            savingsBreakdown={result.savingsBreakdown}
-          />
-        )}
-
-        {/* Credex CTA — only for high-savings audits */}
-        {result.triggersCredexCTA && !result.isAlreadyOptimal && (
-          <CredexCTA slug={params.slug} totalMonthlySavingsCents={result.totalMonthlySavingsCents} />
-        )}
-
-        {/* Share section */}
-        <section aria-label="Share your audit" className="w-full space-y-4 border-t border-white/[0.06] pt-10">
-          <div>
-            <h2 className="text-xs font-mono uppercase tracking-widest text-gray-500 font-semibold mb-1">
-              Share This Audit
-            </h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              This secure link displays your optimization recommendations without exposing any email addresses, team parameters, or actual spending amounts. Safe to share with teammates, executives, or social media.
-            </p>
-          </div>
-          <ShareButton slug={params.slug} />
-        </section>
-
-        {/* Lead capture modal */}
-        <LeadCaptureModal
-          slug={params.slug}
-          totalMonthlySavingsCents={result.totalMonthlySavingsCents}
-          isAlreadyOptimal={result.isAlreadyOptimal}
-          triggersCredexCTA={result.triggersCredexCTA}
-        />
-      </div>
-    </main>
+        </div>
+      </main>
+      <Footer />
+    </>
   )
 }

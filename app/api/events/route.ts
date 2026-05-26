@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { logEvent } from '@/lib/analytics'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
+import { logger } from '@/lib/logger'
 
 // Rate limiting: 60 event logs per IP per minute.
 let ratelimit: Ratelimit | null = null
@@ -15,7 +16,7 @@ try {
     })
   }
 } catch (error) {
-  console.warn('[events] Upstash rate limiting initialization failed/skipped:', error)
+  logger.warn('[events] Upstash rate limiting initialization failed/skipped:', error)
 }
 
 const bodySchema = z.object({
@@ -37,9 +38,10 @@ export async function POST(req: NextRequest) {
         )
       }
     } catch (error) {
-      console.error('[events] Rate limiting check failed:', error)
+      logger.error('[events] Rate limiting check failed:', error)
     }
   }
+
   let body: unknown
   try {
     body = await req.json()

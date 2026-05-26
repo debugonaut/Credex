@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import type { LLMGeneratedSummary } from '@/types'
 import { buildAuditSummaryPrompt, FALLBACK_SUMMARY_TEMPLATE } from '@/prompts/auditSummary'
 import type { AuditInput, AuditResult } from '@/types'
+import { logger } from '@/lib/logger'
 
 const SUMMARY_MODEL = 'claude-haiku-4-5'
 const SUMMARY_MAX_TOKENS = 200
@@ -61,7 +62,7 @@ export async function generateAuditSummary(
     clearTimeout(timeoutId)
 
     // Log for debugging — never surface to user
-    console.error('[anthropic] generateAuditSummary failed:', error)
+    logger.error('[anthropic] generateAuditSummary failed:', error)
 
     // Return the fallback — indistinguishable to users from a real summary
     return {

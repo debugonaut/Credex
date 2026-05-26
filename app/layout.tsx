@@ -1,49 +1,43 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-  display: "swap",
-  preload: true,
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-  display: "swap",
-  preload: true,
-});
+import type { Metadata } from 'next'
+import { GeistSans } from 'geist/font/sans'
+import { GeistMono } from 'geist/font/mono'
+import './globals.css'
 
 export const metadata: Metadata = {
-  title: "StackTally — AI Spend Audit for Startups",
-  description:
-    "Stop overpaying for AI tools. Audit your startup&apos;s AI stack in 60 seconds. Find wasted seats, overlapping tools, and cheaper alternatives.",
+  title: {
+    default: 'StackTally — AI Spend Audit',
+    template: '%s — StackTally',
+  },
+  description: 'Find out if your team is overpaying for AI tools. Free audit in 60 seconds.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   openGraph: {
-    title: "StackTally — AI Spend Audit for Startups",
-    description:
-      "Most startups waste 30% of their AI tool budget. Find your leaks in 60 seconds.",
-    type: "website",
+    type: 'website',
+    siteName: 'StackTally',
+    title: 'StackTally — AI Spend Audit',
+    description: 'Find out if your team is overpaying for AI tools. Free audit in 60 seconds.',
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
+    title: 'StackTally — AI Spend Audit',
+    description: 'Find out if your team is overpaying for AI tools. Free audit in 60 seconds.',
   },
-};
+  // Prevents search engines from indexing individual results pages
+  // (they contain tool configurations that users may not want indexed)
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable}`}
+    >
+      <body className="font-sans bg-bg text-text-primary antialiased">
         {children}
       </body>
     </html>
-  );
+  )
 }

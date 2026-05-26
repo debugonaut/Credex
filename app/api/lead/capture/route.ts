@@ -5,6 +5,7 @@ import { getResendClient } from '@/lib/resend'
 import { AuditConfirmationEmail } from '@/emails/AuditConfirmation'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
+import { logger } from '@/lib/logger'
 
 // Rate limiting: 5 lead submissions per IP per 15 minutes.
 let ratelimit: Ratelimit | null = null
@@ -17,7 +18,7 @@ try {
     })
   }
 } catch (error) {
-  console.warn('[lead/capture] Upstash rate limiting initialization failed/skipped:', error)
+  logger.warn('[lead/capture] Upstash rate limiting initialization failed/skipped:', error)
 }
 
 const bodySchema = z.object({
@@ -40,9 +41,10 @@ export async function POST(req: NextRequest) {
         )
       }
     } catch (error) {
-      console.error('[lead/capture] Rate limiting check failed:', error)
+      logger.error('[lead/capture] Rate limiting check failed:', error)
     }
   }
+
   let body: unknown
   try {
     body = await req.json()
@@ -91,7 +93,7 @@ export async function POST(req: NextRequest) {
 
   if (insertError) {
     // Log but do not expose Supabase error details to the client
-    console.error('[lead/capture] Insert failed:', insertError)
+    logger.error('[lead/capture] Insert failed:', insertError)
     return NextResponse.json({ error: 'Failed to save. Please try again.' }, { status: 500 })
   }
 
@@ -125,12 +127,13 @@ export async function POST(req: NextRequest) {
         .eq('email', email)
 
     } catch (emailError) {
-      console.error('[lead/capture] Background email send failed:', emailError)
+      logger.error('[lead/capture] Background email send failed:', emailError)
       // Capture failure in Sentry
       const Sentry = await import('@sentry/nextjs')
       Sentry.captureException(emailError)
     }
   }
+
 
   // Fire and forget background transactional email send
   sendEmailAsync()

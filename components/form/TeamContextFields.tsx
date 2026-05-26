@@ -39,52 +39,66 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
   }
 
   return (
-    <div className="w-full bg-[#121214]/60 backdrop-blur-sm border border-[#27272A] rounded-2xl p-6 space-y-6 shadow-lg">
-      <h2 className="text-xl font-semibold tracking-tight text-white">
+    <div className="w-full bg-bg-elevated/60 backdrop-blur-sm border border-border rounded-lg p-6 space-y-6 shadow-lg">
+      <h2 className="text-base font-semibold tracking-tight text-white">
         2. Set Team & Workflow Context
       </h2>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Total Team Size Input */}
         <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium text-gray-300">
+          <label
+            htmlFor="team-size-input"
+            className="text-xs font-medium text-text-secondary"
+          >
             Total Team Size
           </label>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-text-muted">
             Including both technical and non-technical staff.
           </p>
-          <div className="flex items-center bg-[#1C1C1E] border border-[#27272A] rounded-xl overflow-hidden h-[42px] max-w-[200px] mt-1">
+          <div className="flex items-center bg-bg border border-border rounded overflow-hidden h-[38px] max-w-[150px] mt-1">
             <button
               type="button"
               onClick={() => handleTeamSizeChange(-1)}
-              className="w-12 h-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#27272A] active:bg-[#1E1E21] transition-all"
+              aria-label="Decrease team size"
+              className="w-12 h-full flex items-center justify-center text-text-secondary hover:text-white hover:bg-bg-subtle active:bg-bg-elevated transition-all min-w-[44px]"
             >
               &minus;
             </button>
             <input
+              id="team-size-input"
               type="number"
+              aria-invalid={!!errors.teamSize}
+              aria-describedby={errors.teamSize ? 'team-size-error' : undefined}
               {...register('teamSize', { valueAsNumber: true })}
-              className="flex-1 bg-transparent text-center text-sm text-white font-medium focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="flex-1 bg-transparent text-center text-sm text-white font-medium focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12"
             />
             <button
               type="button"
               onClick={() => handleTeamSizeChange(1)}
-              className="w-12 h-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#27272A] active:bg-[#1E1E21] transition-all"
+              aria-label="Increase team size"
+              className="w-12 h-full flex items-center justify-center text-text-secondary hover:text-white hover:bg-bg-subtle active:bg-bg-elevated transition-all min-w-[44px]"
             >
               +
             </button>
           </div>
           {errors.teamSize && (
-            <p className="text-xs text-red-400 mt-1">{errors.teamSize.message}</p>
+            <p
+              role="alert"
+              id="team-size-error"
+              className="text-xs text-danger mt-1"
+            >
+              {errors.teamSize.message}
+            </p>
           )}
         </div>
 
         {/* Primary Usecase Selection Grid */}
         <div className="flex flex-col space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-gray-300">
+          <span className="text-xs font-medium text-text-secondary">
             Primary AI Usecase
-          </label>
-          <p className="text-xs text-gray-400">
+          </span>
+          <p className="text-xs text-text-muted">
             What is the primary workload that drives your team&apos;s AI spend?
           </p>
 
@@ -96,18 +110,27 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
                   key={opt.value}
                   type="button"
                   onClick={() => handleUseCaseSelect(opt.value)}
-                  className={`flex flex-col text-left p-4 rounded-xl border transition-all duration-300 ${
+                  aria-pressed={isSelected}
+                  aria-label={`Select primary usecase: ${opt.label}`}
+                  className="flex flex-col text-left p-4 rounded-sm border transition-colors cursor-pointer min-h-[44px] min-w-[44px]"
+                  style={
                     isSelected
-                      ? 'bg-[#00E5A0]/5 border-[#00E5A0] shadow-[0_0_12px_rgba(0,229,160,0.08)]'
-                      : 'bg-[#1C1C1E] border-[#27272A] hover:border-gray-500 hover:bg-[#222225]'
-                  }`}
+                      ? {
+                          borderColor: 'var(--color-accent)',
+                          backgroundColor: 'rgba(0, 229, 160, 0.08)',
+                          color: 'var(--color-accent)',
+                        }
+                      : {
+                          borderColor: 'var(--color-border)',
+                          backgroundColor: 'transparent',
+                          color: 'var(--color-text-secondary)',
+                        }
+                  }
                 >
-                  <span className={`text-sm font-semibold transition-colors ${
-                    isSelected ? 'text-[#00E5A0]' : 'text-gray-200'
-                  }`}>
+                  <span className="text-xs sm:text-sm font-semibold">
                     {opt.label}
                   </span>
-                  <span className="mt-1.5 text-[10px] text-gray-400 leading-normal line-clamp-3">
+                  <span className="mt-1.5 text-[10px] text-text-muted leading-normal line-clamp-3">
                     {opt.description}
                   </span>
                 </button>
@@ -115,7 +138,13 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
             })}
           </div>
           {errors.primaryUseCase && (
-            <p className="text-xs text-red-400 mt-1">{errors.primaryUseCase.message}</p>
+            <p
+              role="alert"
+              id="usecase-error"
+              className="text-xs text-danger mt-1"
+            >
+              {errors.primaryUseCase.message}
+            </p>
           )}
         </div>
       </div>

@@ -79,11 +79,15 @@ export function AuditForm() {
     }
   }
 
+  // Running monthly spend total calculation
+  const tools = form.watch('tools') || []
+  const totalMonthlySpend = tools.reduce((sum, t) => sum + (Number(t?.monthlySpendUSD) || 0), 0)
+
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
       noValidate
-      className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in"
+      className="w-full space-y-8 animate-fade-slide-up"
     >
       {/* 1. Tool Selection Chips */}
       <ToolSelector fields={fields} append={append} remove={remove} />
@@ -91,11 +95,11 @@ export function AuditForm() {
       {/* Selected Tool Inputs */}
       {fields.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold tracking-tight text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <h2 className="text-base font-semibold tracking-tight text-white">
               Configure Your Stack Details
             </h2>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-text-muted">
               Provide exact seats and actual monthly spends for standard accuracy.
             </p>
           </div>
@@ -116,16 +120,32 @@ export function AuditForm() {
       {/* 2. Team Size & Context Fields */}
       <TeamContextFields form={form} />
 
+      {/* Running monthly spend sticky summary */}
+      {totalMonthlySpend > 0 && (
+        <div className="flex items-center justify-between py-4 border-t border-border mt-6">
+          <span className="text-sm text-text-secondary">Current monthly spend</span>
+          <span className="font-mono font-medium text-white text-base">
+            ${totalMonthlySpend.toLocaleString('en-US')}/mo
+          </span>
+        </div>
+      )}
+
       {/* Validation Error Message Alert if tools array is empty */}
       {form.formState.errors.tools && (
-        <div className="p-4 rounded-xl border border-red-900/30 bg-red-950/20 text-red-400 text-sm">
+        <div
+          role="alert"
+          className="p-4 rounded border border-danger/30 bg-danger/10 text-danger text-sm"
+        >
           ⚠️ {form.formState.errors.tools.message}
         </div>
       )}
 
       {/* API Submission Error Message */}
       {submitError && (
-        <div role="alert" className="p-4 rounded-xl border border-red-900/30 bg-red-950/20 text-red-400 text-sm">
+        <div
+          role="alert"
+          className="p-4 rounded border border-danger/30 bg-danger/10 text-danger text-sm"
+        >
           ⚠️ {submitError}
         </div>
       )}
@@ -136,7 +156,7 @@ export function AuditForm() {
           type="submit"
           disabled={submitting}
           aria-busy={submitting}
-          className="relative inline-flex items-center justify-center px-8 py-3.5 text-sm font-semibold rounded-xl bg-[#00E5A0] text-black shadow-lg hover:bg-[#00D090] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="relative inline-flex items-center justify-center px-8 py-3 text-sm font-semibold rounded bg-[#00E5A0] text-black shadow-lg hover:bg-[#00D090] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px] min-w-[44px]"
         >
           {submitting ? 'Running Audit…' : 'Run Spend Audit'}
         </button>

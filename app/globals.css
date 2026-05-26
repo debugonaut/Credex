@@ -2,26 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design tokens ──────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background scale — near-black, not pure black */
+  --color-bg:          #0A0A0B;
+  --color-bg-elevated: #111113;  /* cards, inputs */
+  --color-bg-subtle:   #18181B;  /* hover states */
+
+  /* Text scale */
+  --color-text-primary:   #F2F2F0;
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted:     #666669; /* lighter than #555558 for WCAG AAA contrast */
+
+  /* Semantic colors — each carries meaning, used consistently */
+  --color-accent:   #00E5A0;   /* savings, positive outcomes, CTAs */
+  --color-danger:   #FF4D4D;   /* overspend flags, errors */
+  --color-border:   rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Spacing base — 4px unit, all values are multiples */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* Border radius — financial tool, not consumer app */
+  --radius-sm: 4px;   /* badges, small chips */
+  --radius-md: 8px;   /* cards, inputs */
+  --radius-lg: 12px;  /* main containers */
+
+  /* Typography scale */
+  --font-size-xs:   0.75rem;    /* 12px */
+  --font-size-sm:   0.875rem;   /* 14px */
+  --font-size-base: 0.9375rem;  /* 15px */
+  --font-size-lg:   1.125rem;   /* 18px */
+  --font-size-xl:   1.25rem;    /* 20px */
+  --font-size-2xl:  1.5rem;     /* 24px */
+  --font-size-display: clamp(2.5rem, 6vw, 5rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base resets ────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100vh;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ─── Focus styles — visible and branded ────────────────────── */
+/* Default browser outline is ugly. This is accessible AND on-brand. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove focus ring on mouse click — only show for keyboard navigation */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ─── Form elements — consistent across browsers ────────────── */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ─── Scrollbar — subtle, matches the dark theme ────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* ─── Shimmer animation — used in AISummaryBlock skeleton ───── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Fade-in animation — for tool cards appearing ──────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.2s ease-out forwards;
 }

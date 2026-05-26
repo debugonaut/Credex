@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import { createServerSupabaseClient } from '@/lib/supabase'
+import { logger } from '@/lib/logger'
 
 export const runtime = 'edge'
 export const size = { width: 1200, height: 630 }
@@ -29,8 +30,9 @@ export default async function OGImage({ params }: Props) {
     result = data?.result
   } catch (error) {
     // Graceful fallback if Supabase keys are not set yet or database is unreachable
-    console.warn('[og-image] Failed to fetch audit result for OG Image:', error)
+    logger.warn('[og-image] Failed to fetch audit result for OG Image:', error)
   }
+
 
   const monthlySavings = result
     ? `$${(result.totalMonthlySavingsCents / 100).toLocaleString('en-US', {

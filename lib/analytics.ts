@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from './supabase'
+import { logger } from '@/lib/logger'
 
 type EventType = 'form_started' | 'audit_completed' | 'email_captured' | 'cta_clicked' | 'link_shared'
 
@@ -16,6 +17,7 @@ export async function logEvent(
     })
   } catch (error) {
     // Analytics failures are never fatal — log and move on
-    console.error('[analytics] logEvent failed:', error)
+    logger.error('[analytics] logEvent failed:', error)
   }
 }
+

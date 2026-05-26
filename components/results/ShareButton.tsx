@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { logger } from '@/lib/logger'
 
 interface ShareButtonProps {
   slug: string
@@ -45,10 +46,11 @@ export function ShareButton({ slug }: ShareButtonProps) {
         setTimeout(() => setCopied(false), 2000)
         logSharedEvent()
       } catch (fallbackError) {
-        console.error('Failed to copy to clipboard:', fallbackError)
+        logger.error('Failed to copy to clipboard:', fallbackError)
       }
     }
   }
+
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
