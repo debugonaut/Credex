@@ -41,15 +41,15 @@ export function AISummaryBlock({ slug, initialSummary }: AISummaryBlockProps) {
   if (loading) {
     return (
       <div aria-label="Generating AI summary" aria-busy="true" className="w-full space-y-4">
-        <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted mb-2 font-semibold">
-          AI Analysis Summary
+        <h2 className="text-xs font-mono uppercase tracking-widest text-text-secondary font-bold">
+          {"// AI Analysis Summary"}
         </h2>
         {/* Three-line skeleton shimmer — pure CSS animation */}
         <div className="space-y-3">
           {[100, 92, 78].map((width, i) => (
             <div
               key={i}
-              className="h-4 rounded skeleton-shimmer"
+              className="h-4 rounded-none skeleton-shimmer"
               style={{ width: `${width}%` }}
               aria-hidden="true"
             />
@@ -63,10 +63,10 @@ export function AISummaryBlock({ slug, initialSummary }: AISummaryBlockProps) {
 
   return (
     <section aria-label="AI-generated audit summary" className="w-full space-y-3 animate-fade-slide-up">
-      <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted font-semibold">
-        AI Analysis
+      <h2 className="text-xs font-mono uppercase tracking-widest text-text-secondary font-bold">
+        {"// AI Analysis"}
       </h2>
-      <p className="text-base text-text-secondary leading-relaxed font-sans">{summary}</p>
+      <p className="text-lg text-black leading-relaxed font-serif">{summary}</p>
     </section>
   )
 }

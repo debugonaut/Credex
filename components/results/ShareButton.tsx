@@ -55,7 +55,7 @@ export function ShareButton({ slug }: ShareButtonProps) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
       <code 
-        className="flex-1 text-xs font-mono text-gray-400 bg-white/[0.03] px-4 py-3 rounded-xl border border-white/[0.08] truncate select-all"
+        className="flex-1 text-xs font-mono text-black bg-bg-subtle px-4 py-3 rounded-none border border-black truncate select-all"
         title={shareUrl}
       >
         {shareUrl}
@@ -63,14 +63,14 @@ export function ShareButton({ slug }: ShareButtonProps) {
       <button
         onClick={handleCopy}
         aria-label={copied ? 'Link copied to clipboard' : 'Copy shareable link'}
-        className="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer whitespace-nowrap"
+        className="px-6 py-3 border-2 font-mono text-xs uppercase tracking-widest font-bold transition-all duration-100 cursor-pointer whitespace-nowrap rounded-none text-center hover:bg-black hover:text-white"
         style={{
-          backgroundColor: copied ? '#00E5A0' : 'rgba(255, 255, 255, 0.08)',
-          color: copied ? '#0A0A0B' : 'white',
-          border: copied ? '1px solid #00E5A0' : '1px solid rgba(255, 255, 255, 0.05)',
+          backgroundColor: copied ? '#000000' : 'transparent',
+          color: copied ? '#FFFFFF' : '#000000',
+          borderColor: '#000000',
         }}
       >
-        {copied ? 'Copied!' : 'Copy Link'}
+        {copied ? 'COPIED!' : 'COPY LINK'}
       </button>
     </div>
   )

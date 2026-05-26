@@ -2,24 +2,21 @@ import Link from 'next/link'
 
 export function Header() {
   return (
-    <header
-      className="sticky top-0 z-40 border-b border-border"
-      style={{ backgroundColor: 'rgba(10, 10, 11, 0.9)', backdropFilter: 'blur(12px)' }}
-    >
-      <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-black bg-white">
+      <div className="max-w-6xl mx-auto px-6 md:px-8 lg:px-12 h-16 flex items-center justify-between">
         <Link
           href="/"
-          className="font-mono font-medium text-white text-sm hover:text-accent transition-colors"
+          className="font-serif font-bold text-xl tracking-tight text-black hover:opacity-70 transition-opacity focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-2"
           aria-label="StackTally — home"
         >
-          stacktally
+          stacktally.
         </Link>
         <nav aria-label="Primary navigation">
           <Link
             href="/"
-            className="text-sm text-text-secondary hover:text-white transition-colors"
+            className="font-mono text-xs uppercase tracking-widest text-text-secondary hover:text-black hover:underline transition-all focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-2"
           >
-            New audit
+            New Audit
           </Link>
         </nav>
       </div>

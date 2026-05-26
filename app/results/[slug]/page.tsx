@@ -171,24 +171,24 @@ export default async function ResultsPage({ params }: Props) {
   // Developer-friendly guide when environment variables are not yet setup
   if (devModeMissingEnv || !data) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#0A0A0B] p-6 text-white">
-        <div className="max-w-md w-full bg-white/[0.02] border border-amber-500/30 p-8 rounded-2xl space-y-6">
-          <div className="flex items-center gap-3 text-amber-400">
-            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      <main className="min-h-screen flex items-center justify-center bg-white p-6 text-black bg-monochrome-grid bg-monochrome-noise">
+        <div className="max-w-md w-full bg-white border-2 border-black p-8 space-y-6">
+          <div className="flex items-center gap-3 text-black">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
-            <h1 className="text-lg font-bold tracking-tight">Supabase Keys Required</h1>
+            <h1 className="text-sm font-mono uppercase tracking-widest font-bold">Supabase Keys Required</h1>
           </div>
-          <p className="text-sm text-gray-300 leading-relaxed">
-            This results page relies on a server-side fetch from your Supabase database. To run locally, please copy the `.env.example` file to `.env.local` and fill in your Supabase variables.
+          <p className="text-sm text-text-secondary leading-relaxed font-serif">
+            This results page relies on a server-side fetch from your Supabase database. To run locally, please copy the <code className="font-mono text-xs bg-bg-subtle px-1">.env.example</code> file to <code className="font-mono text-xs bg-bg-subtle px-1">.env.local</code> and fill in your Supabase variables.
           </p>
-          <div className="bg-white/[0.04] p-4 rounded-xl border border-white/[0.08] text-xs font-mono text-gray-400 space-y-1">
+          <div className="bg-bg-subtle p-4 border border-black text-xs font-mono text-text-secondary space-y-1">
             <p>SUPABASE_URL=https://your-project.supabase.co</p>
             <p>SUPABASE_SERVICE_ROLE_KEY=your-role-key</p>
             <p>NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co</p>
             <p>NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key</p>
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-text-muted font-mono uppercase tracking-wider">
             Once variables are set, submit an audit from the homepage to save a result and generate a valid slug URL.
           </p>
         </div>
@@ -211,8 +211,8 @@ export default async function ResultsPage({ params }: Props) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-bg">
-        <div className="max-w-2xl mx-auto px-4 py-16 space-y-12 sm:space-y-20">
+      <main className="min-h-screen bg-white relative bg-monochrome-grid bg-monochrome-noise">
+        <div className="max-w-4xl mx-auto px-6 md:px-8 lg:px-12 py-24 space-y-16 sm:space-y-24">
           {/* Visually hidden semantic h1 tag for screen readers & SEO mapping */}
           <h1 className="sr-only">
             {result.isAlreadyOptimal
@@ -220,7 +220,7 @@ export default async function ResultsPage({ params }: Props) {
               : `AI Spend Audit: $${(result.totalMonthlySavingsCents / 100).toFixed(0)}/month in potential savings found`
             }
           </h1>
-
+ 
           {/* Hero: big savings number or optimal badge */}
           {result.isAlreadyOptimal ? (
             <OptimalBadge />
@@ -232,49 +232,49 @@ export default async function ResultsPage({ params }: Props) {
               toolCount={audit.tools.length}
             />
           )}
-
-          <hr className="border-border" />
-
+ 
+          <hr className="border-t-4 border-black" />
+ 
           {/* AI summary — client component, loads async */}
           <AISummaryBlock
             slug={params.slug}
             initialSummary={audit.aiSummary}
           />
-
+ 
           {/* Per-tool breakdown cards */}
           {!result.isAlreadyOptimal && (
             <>
-              <hr className="border-border" />
+              <hr className="border-t-4 border-black" />
               <ToolBreakdown
                 recommendations={result.recommendations}
                 savingsBreakdown={result.savingsBreakdown}
               />
             </>
           )}
-
+ 
           {/* Credex CTA — only for high-savings audits */}
           {result.triggersCredexCTA && !result.isAlreadyOptimal && (
             <>
-              <hr className="border-border" />
+              <hr className="border-t-4 border-black" />
               <CredexCTA slug={params.slug} totalMonthlySavingsCents={result.totalMonthlySavingsCents} />
             </>
           )}
-
-          <hr className="border-border" />
-
+ 
+          <hr className="border-t-4 border-black" />
+ 
           {/* Share section */}
-          <section aria-label="Share your audit" className="w-full space-y-4 pt-4">
-            <div>
-              <h2 className="text-xs font-mono uppercase tracking-widest text-text-muted font-semibold mb-1">
+          <section aria-label="Share your audit" className="w-full space-y-6 pt-4">
+            <div className="space-y-2">
+              <h2 className="text-xs font-mono uppercase tracking-widest text-text-secondary font-bold">
                 Share This Audit
               </h2>
-              <p className="text-sm text-text-secondary leading-relaxed">
-                This secure link displays your optimization recommendations without exposing any email addresses, team parameters, or actual spending amounts. Safe to share with teammates, executives, or social media.
+              <p className="text-sm text-text-secondary leading-relaxed font-serif max-w-2xl">
+                This secure link displays your optimization recommendations without exposing any email addresses, team parameters, or actual spending amounts. Safe to share with teammates, executives, or partners.
               </p>
             </div>
             <ShareButton slug={params.slug} />
           </section>
-
+ 
           {/* Lead capture modal */}
           <LeadCaptureModal
             slug={params.slug}

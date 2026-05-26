@@ -14,41 +14,35 @@ export function CredexCTA({ slug, totalMonthlySavingsCents }: CredexCTAProps) {
   return (
     <aside
       aria-label="Credex consultation offer"
-      className="w-full rounded border p-6 sm:p-8 backdrop-blur-md transition-all duration-300"
-      style={{
-        borderColor: 'var(--color-accent)',
-        backgroundColor: 'rgba(0, 229, 160, 0.04)',
-        boxShadow: '0 0 32px rgba(0, 229, 160, 0.08)',
-      }}
+      className="w-full border border-white bg-black p-6 sm:p-8 relative bg-inverted-lines bg-inverted-radial overflow-hidden rounded-none shadow-none"
     >
-      <div className="flex flex-col space-y-4">
-        <div>
-          <p className="text-xs font-mono uppercase tracking-widest mb-2 font-semibold text-accent">
-            You qualify for a Credex consultation
+      <div className="flex flex-col space-y-6 relative z-10">
+        <div className="space-y-2">
+          <p className="text-xs font-mono uppercase tracking-widest font-bold text-white/70">
+            {"// High-Savings Advisory Qualify"}
           </p>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Capture ${savingsDollars}/mo in savings with discounted AI credits
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white tracking-tight leading-none">
+            Capture ${savingsDollars}/mo in savings with discounted AI credits.
           </h2>
         </div>
-        <p className="text-sm text-text-secondary leading-relaxed">
+        <p className="text-sm text-white/80 leading-relaxed font-serif">
           Credex sources discounted AI infrastructure credits from high-growth companies that
           overforecasted their usage commitments. At your spend level, that is an estimated{' '}
-          <strong className="text-white">${annualDollars}/year</strong> in direct, recoverable costs.
+          <strong className="text-white underline decoration-white/40 decoration-2 underline-offset-4">${annualDollars}/year</strong> in direct, recoverable costs.
           A 20-minute consultation is completely free — we will show you exactly what is available
           for your stack.
         </p>
       </div>
 
       {/* CTA button — links to server-side redirect endpoint to ensure zero client-side hydration */}
-      <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-6">
+      <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:gap-6 relative z-10">
         <a
           href={`/api/cta-redirect?slug=${slug}`}
-          className="inline-flex items-center justify-center px-6 py-3 rounded text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-center"
-          style={{ backgroundColor: 'var(--color-accent)', color: '#0A0A0B' }}
+          className="inline-flex items-center justify-center px-8 py-4 bg-white text-black border border-white font-mono text-xs uppercase tracking-widest font-bold transition-all duration-100 hover:bg-transparent hover:text-white rounded-none text-center"
         >
           Book a free consultation →
         </a>
-        <p className="text-xs text-text-muted mt-3 sm:mt-0 leading-normal max-w-xs">
+        <p className="text-xs text-white/50 mt-3 sm:mt-0 leading-normal max-w-xs font-mono uppercase tracking-wider">
           No commitments. 20 minutes. We will map current credit availability to your specific tools.
         </p>
       </div>

@@ -1,7 +1,24 @@
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Playfair_Display, Source_Serif_4, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-serif-display',
+  display: 'swap',
+})
+
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-serif-body',
+  display: 'swap',
+})
+
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -33,9 +50,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${playfair.variable} ${sourceSerif.variable} ${jetbrains.variable}`}
     >
-      <body className="font-sans bg-bg text-text-primary antialiased">
+      <body className="font-serif bg-bg text-text-primary antialiased">
         {children}
       </body>
     </html>

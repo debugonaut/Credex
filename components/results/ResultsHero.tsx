@@ -30,42 +30,37 @@ export function ResultsHero({
   return (
     <section
       aria-label="Audit result summary"
-      className="relative w-full py-12 text-center overflow-hidden"
+      className="relative w-full text-center"
     >
-      {/* Background dynamic ambient glow element */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(0, 229, 160, 0.05) 0%, transparent 70%)',
-        }}
-      />
+      <div className="border-2 border-black p-8 md:p-12 bg-white relative bg-monochrome-grid overflow-hidden">
+        {/* Eyebrow label */}
+        <p className="text-xs font-mono uppercase tracking-widest text-text-secondary mb-6 relative z-10">
+          Potential Monthly Savings
+        </p>
 
-      {/* Eyebrow label */}
-      <p className="text-xs font-mono uppercase tracking-widest text-accent mb-4 relative z-10">
-        Potential Monthly Savings
-      </p>
+        {/* Hero number — oversized editorial Playfair Display serif */}
+        <div
+          aria-label={`Total monthly savings: $${animatedMonthlySavings}`}
+          aria-live="polite"
+          className="font-serif font-bold leading-none tracking-tighter text-black select-all cursor-pointer relative z-10"
+          style={{ fontSize: 'clamp(3rem, 12vw, 7.5rem)' }}
+        >
+          ${animatedMonthlySavings}
+          <span className="text-xl sm:text-2xl ml-2 font-mono font-medium tracking-wide uppercase opacity-60 text-text-secondary">/mo</span>
+        </div>
 
-      {/* Hero number — this is what gets screenshotted */}
-      {/* aria-label provides the full readable value for screen readers */}
-      <div
-        aria-label={`Total monthly savings: $${animatedMonthlySavings}`}
-        aria-live="polite"
-        className="font-mono font-bold leading-none tracking-tight select-all cursor-pointer relative z-10"
-        style={{ fontSize: 'clamp(2.5rem, 10vw, 6rem)', color: 'var(--color-accent)' }}
-      >
-        ${animatedMonthlySavings}
-        <span className="text-2xl sm:text-3xl ml-2 font-medium opacity-60 text-text-secondary">/mo</span>
+        {/* Geometric divider line */}
+        <div className="w-16 h-1 bg-black mx-auto my-6 relative z-10" />
+
+        {/* Annual savings — secondary stat */}
+        <p className="text-xs sm:text-sm text-black font-mono uppercase tracking-widest relative z-10 font-bold">
+          ${annualSavings} saved per year
+        </p>
       </div>
 
-      {/* Annual savings — secondary stat */}
-      <p className="mt-4 text-lg text-text-secondary font-mono relative z-10">
-        ${annualSavings} saved per year
-      </p>
-
-      {/* Context line */}
-      <p className="mt-6 text-text-muted text-xs sm:text-sm relative z-10">
-        Across {toolCount} tool{toolCount !== 1 ? 's' : ''} in your stack
+      {/* Context line below the boxed cards */}
+      <p className="mt-6 text-text-secondary font-serif text-sm italic relative z-10">
+        Identified across {toolCount} software tool{toolCount !== 1 ? 's' : ''} in your active stack.
       </p>
     </section>
   )

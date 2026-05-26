@@ -4,6 +4,7 @@ module.exports = {
       startServerCommand: 'pnpm run start',
       startServerReadyPattern: 'ready|started|localhost',
       startServerReadyTimeout: 60000,
+      chromeFlags: '--no-sandbox --ignore-certificate-errors --disable-features=SafeBrowsing --disable-gpu',
       url: [
         (process.env.LHCI_BASE_URL || 'http://localhost:3000') + '/',
         // Results page URL needs a real slug — hardcode one from your test data

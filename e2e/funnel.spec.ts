@@ -6,7 +6,7 @@ test.describe('StackTally Conversion Funnel E2E', () => {
     await page.goto('/')
     
     // Assert primary SEO title is present
-    await expect(page.locator('h1')).toContainText('Stop overpaying for AI')
+    await expect(page.locator('h1')).toContainText('Stop overpaying for AI', { ignoreCase: true })
 
     // 2. Select Cursor tool
     const cursorChip = page.locator('button:has-text("Cursor")').first()
@@ -56,7 +56,7 @@ test.describe('StackTally Conversion Funnel E2E', () => {
     const pageUrl = page.url()
     if (pageUrl.includes('/results/')) {
       // If Supabase keys are active and redirects to results page
-      await expect(page.locator('h2')).toContainText('AI Analysis Summary')
+      await expect(page.locator('h2').first()).toContainText('AI Analysis')
     } else {
       // Otherwise, the development sandbox gracefully displays the Supabase Keys Alert page
       const alertHeader = page.locator('h1:has-text("Keys Required")')

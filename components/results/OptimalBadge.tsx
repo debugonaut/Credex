@@ -17,7 +17,6 @@ export function OptimalBadge() {
 
     try {
       // Note: Wired up to lead capture API (fully completed in Phase 4)
-      // For now, we will perform a mock delay and show success to maintain premium feel.
       await new Promise(resolve => setTimeout(resolve, 800))
       setSubscribed(true)
     } catch {
@@ -30,53 +29,41 @@ export function OptimalBadge() {
   return (
     <section
       aria-label="Audit result: spending is already optimized"
-      className="w-full py-16 text-center animate-fade-in"
+      className="w-full py-12 text-center"
     >
-      {/* Visual indicator checkmark */}
-      <div
-        className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-8"
-        style={{
-          backgroundColor: 'rgba(0, 229, 160, 0.08)',
-          border: '1.5px solid #00E5A0',
-          boxShadow: '0 0 25px rgba(0, 229, 160, 0.1)',
-        }}
-        aria-hidden="true"
-      >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M5 12l5 5L20 7"
-            stroke="#00E5A0"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+      {/* Prestigious double-line thin border box */}
+      <div className="inline-flex items-center justify-center p-1.5 border border-black mb-8 bg-white">
+        <div className="border border-black px-6 py-4 bg-white">
+          <span className="font-serif italic text-2xl md:text-3xl text-black tracking-tight block">
+            Optimal Stack Verified
+          </span>
+        </div>
       </div>
 
-      <h1 className="text-3xl font-extrabold text-white tracking-tight mb-4">
-        Your stack is well-optimized
+      <h1 className="text-3xl md:text-4xl font-serif font-bold text-black tracking-tight mb-4">
+        Your stack is well-optimized.
       </h1>
-      <p className="text-gray-400 text-base max-w-md mx-auto leading-relaxed">
+      <p className="text-text-secondary text-base max-w-lg mx-auto leading-relaxed font-serif">
         Based on your team size, primary use cases, and current plans, you are not
         meaningfully overspending on AI tools. We did not find any savings worth recommending.
       </p>
 
       {/* Capture lead with subscription */}
-      <div className="mt-12 max-w-md mx-auto p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-        <p className="text-sm font-medium text-white mb-2">
-          Monitor Future Price Changes
+      <div className="mt-12 max-w-md mx-auto p-6 border-2 border-black bg-white relative bg-monochrome-grid">
+        <p className="text-sm font-mono uppercase tracking-widest font-bold text-black mb-2">
+          {"// Monitor Future Price Changes"}
         </p>
-        <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+        <p className="text-xs text-text-secondary mb-6 leading-relaxed font-serif">
           AI tool pricing models and features shift frequently. Enter your email below to be notified when plan changes or new alternatives become more economical for your stack.
         </p>
 
         {subscribed ? (
-          <div className="py-3 px-4 rounded-xl bg-emerald-500/10 text-emerald-400 text-sm font-medium border border-emerald-500/20">
-            ✓ You are subscribed! We will notify you of any price changes.
+          <div className="py-4 px-4 border border-black bg-black text-white text-xs font-mono uppercase tracking-widest font-bold">
+            ✓ Subscribed to Pricing Updates
           </div>
         ) : (
-          <form onSubmit={handleSubscribe} className="space-y-3">
-            <div className="flex gap-2">
+          <form onSubmit={handleSubscribe} className="space-y-4">
+            <div className="flex flex-col gap-3">
               <input
                 type="email"
                 required
@@ -84,20 +71,19 @@ export function OptimalBadge() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 aria-label="Email address for notifications"
-                className="flex-1 rounded-xl px-4 py-2.5 text-sm bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:border-white/30 transition-all"
+                className="w-full border-b-2 border-black bg-transparent text-black text-sm px-2 py-3 focus:border-b-4 focus:outline-none rounded-none placeholder:text-text-muted/60"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ backgroundColor: 'white', color: '#0A0A0B' }}
+                className="w-full bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black py-3 text-xs font-mono uppercase tracking-widest font-bold transition-all duration-100 rounded-none cursor-pointer"
               >
-                {submitting ? 'Subscribing...' : 'Notify me'}
+                {submitting ? 'Subscribing...' : 'Notify me of price shifts'}
               </button>
             </div>
             {error && (
-              <p role="alert" className="text-xs text-[#FF4D4D] text-left">
-                {error}
+              <p role="alert" className="text-xs font-mono text-black font-bold text-left">
+                ⚠️ {error}
               </p>
             )}
           </form>

@@ -32,11 +32,11 @@ export function ToolSelector({ fields, append, remove }: ToolSelectorProps) {
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold tracking-tight text-white">
-          1. Select the AI Tools in your Stack
-        </h2>
+        <span className="text-xs font-mono uppercase tracking-widest text-text-secondary">
+          Click tiles to activate/deactivate
+        </span>
         <span
-          className="text-xs font-mono px-2.5 py-1 rounded-sm bg-bg-elevated text-text-secondary border border-border"
+          className="text-xs font-mono px-3 py-1 bg-black text-white font-bold uppercase tracking-wider"
           aria-live="polite"
         >
           {fields.length} {fields.length === 1 ? 'tool' : 'tools'} selected
@@ -53,25 +53,18 @@ export function ToolSelector({ fields, append, remove }: ToolSelectorProps) {
               onClick={() => handleToggle(tool.toolId)}
               aria-pressed={isSelected}
               aria-label={`Toggle ${tool.displayName} in your stack selection`}
-              className="px-4 py-2 rounded-sm text-sm font-medium border transition-colors cursor-pointer min-h-[44px] min-w-[44px] flex flex-col items-center justify-center gap-0.5"
-              style={
+              className={`px-4 py-3 border transition-colors cursor-pointer min-h-[48px] flex flex-col items-center justify-center gap-0.5 focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-2 ${
                 isSelected
-                  ? {
-                      borderColor: 'var(--color-accent)',
-                      backgroundColor: 'rgba(0, 229, 160, 0.08)',
-                      color: 'var(--color-accent)',
-                    }
-                  : {
-                      borderColor: 'var(--color-border)',
-                      backgroundColor: 'transparent',
-                      color: 'var(--color-text-secondary)',
-                    }
-              }
+                  ? 'bg-black text-white border-black'
+                  : 'bg-white text-black border-black/20 hover:border-black hover:bg-black/[0.02]'
+              }`}
             >
-              <span className="font-semibold text-xs sm:text-sm">
+              <span className="font-serif font-bold text-sm tracking-tight">
                 {tool.displayName}
               </span>
-              <span className="text-[9px] opacity-75 font-mono">
+              <span className={`text-[9px] font-mono uppercase tracking-widest ${
+                isSelected ? 'text-text-muted' : 'text-text-secondary'
+              }`}>
                 {tool.isApiOnly ? 'API' : `${tool.plans.length} tiers`}
               </span>
             </button>

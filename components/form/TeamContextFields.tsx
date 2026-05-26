@@ -39,9 +39,9 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
   }
 
   return (
-    <div className="w-full bg-bg-elevated/60 backdrop-blur-sm border border-border rounded-lg p-6 space-y-6 shadow-lg">
-      <h2 className="text-base font-semibold tracking-tight text-white">
-        2. Set Team & Workflow Context
+    <div className="w-full bg-white border border-black p-6 md:p-8 space-y-6">
+      <h2 className="font-serif font-bold text-2xl text-black uppercase tracking-tight">
+        Set Team & Workflow Context
       </h2>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -49,19 +49,19 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
         <div className="flex flex-col space-y-2">
           <label
             htmlFor="team-size-input"
-            className="text-xs font-medium text-text-secondary"
+            className="text-xs font-mono uppercase tracking-widest text-text-secondary"
           >
             Total Team Size
           </label>
-          <p className="text-xs text-text-muted">
+          <p className="text-xs text-text-muted font-serif">
             Including both technical and non-technical staff.
           </p>
-          <div className="flex items-center bg-bg border border-border rounded overflow-hidden h-[38px] max-w-[150px] mt-1">
+          <div className="flex items-center bg-white border-2 border-black h-[38px] max-w-[150px] mt-1">
             <button
               type="button"
               onClick={() => handleTeamSizeChange(-1)}
               aria-label="Decrease team size"
-              className="w-12 h-full flex items-center justify-center text-text-secondary hover:text-white hover:bg-bg-subtle active:bg-bg-elevated transition-all min-w-[44px]"
+              className="w-12 h-full flex items-center justify-center text-black border-r border-black hover:bg-black hover:text-white transition-colors duration-100 min-w-[40px] focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-1"
             >
               &minus;
             </button>
@@ -71,13 +71,13 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
               aria-invalid={!!errors.teamSize}
               aria-describedby={errors.teamSize ? 'team-size-error' : undefined}
               {...register('teamSize', { valueAsNumber: true })}
-              className="flex-1 bg-transparent text-center text-sm text-white font-medium focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12"
+              className="flex-1 bg-transparent text-center text-sm text-black font-mono font-bold focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none w-12"
             />
             <button
               type="button"
               onClick={() => handleTeamSizeChange(1)}
               aria-label="Increase team size"
-              className="w-12 h-full flex items-center justify-center text-text-secondary hover:text-white hover:bg-bg-subtle active:bg-bg-elevated transition-all min-w-[44px]"
+              className="w-12 h-full flex items-center justify-center text-black border-l border-black hover:bg-black hover:text-white transition-colors duration-100 min-w-[40px] focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-1"
             >
               +
             </button>
@@ -86,7 +86,7 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
             <p
               role="alert"
               id="team-size-error"
-              className="text-xs text-danger mt-1"
+              className="text-xs font-mono uppercase tracking-wider text-black mt-1"
             >
               {errors.teamSize.message}
             </p>
@@ -95,10 +95,10 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
 
         {/* Primary Usecase Selection Grid */}
         <div className="flex flex-col space-y-2 md:col-span-2">
-          <span className="text-xs font-medium text-text-secondary">
+          <span className="text-xs font-mono uppercase tracking-widest text-text-secondary">
             Primary AI Usecase
           </span>
-          <p className="text-xs text-text-muted">
+          <p className="text-xs text-text-muted font-serif">
             What is the primary workload that drives your team&apos;s AI spend?
           </p>
 
@@ -112,25 +112,18 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
                   onClick={() => handleUseCaseSelect(opt.value)}
                   aria-pressed={isSelected}
                   aria-label={`Select primary usecase: ${opt.label}`}
-                  className="flex flex-col text-left p-4 rounded-sm border transition-colors cursor-pointer min-h-[44px] min-w-[44px]"
-                  style={
+                  className={`flex flex-col text-left p-4 border transition-colors cursor-pointer min-h-[48px] focus-visible:outline focus-visible:outline-3 focus-visible:outline-black focus-visible:outline-offset-2 ${
                     isSelected
-                      ? {
-                          borderColor: 'var(--color-accent)',
-                          backgroundColor: 'rgba(0, 229, 160, 0.08)',
-                          color: 'var(--color-accent)',
-                        }
-                      : {
-                          borderColor: 'var(--color-border)',
-                          backgroundColor: 'transparent',
-                          color: 'var(--color-text-secondary)',
-                        }
-                  }
+                      ? 'bg-black text-white border-black'
+                      : 'bg-white text-black border-black/20 hover:border-black hover:bg-black/[0.02]'
+                  }`}
                 >
-                  <span className="text-xs sm:text-sm font-semibold">
+                  <span className="font-serif font-bold text-sm tracking-tight">
                     {opt.label}
                   </span>
-                  <span className="mt-1.5 text-[10px] text-text-muted leading-normal line-clamp-3">
+                  <span className={`mt-1.5 text-[10px] leading-normal line-clamp-3 font-serif ${
+                    isSelected ? 'text-text-muted' : 'text-text-secondary'
+                  }`}>
                     {opt.description}
                   </span>
                 </button>
@@ -141,7 +134,7 @@ export function TeamContextFields({ form }: TeamContextFieldsProps) {
             <p
               role="alert"
               id="usecase-error"
-              className="text-xs text-danger mt-1"
+              className="text-xs font-mono uppercase tracking-wider text-black mt-1"
             >
               {errors.primaryUseCase.message}
             </p>
