@@ -1,9 +1,13 @@
 module.exports = {
   ci: {
     collect: {
+      startServerCommand: 'pnpm run start',
+      startServerReadyPattern: 'ready|started|localhost',
+      startServerReadyTimeout: 60000,
       url: [
         (process.env.LHCI_BASE_URL || 'http://localhost:3000') + '/',
         // Results page URL needs a real slug — hardcode one from your test data
+        // Update this when your Vercel URL changes
         (process.env.LHCI_BASE_URL || 'http://localhost:3000') + '/results/' + (process.env.LHCI_TEST_SLUG || 'test-slug'),
       ],
       numberOfRuns: 1,
