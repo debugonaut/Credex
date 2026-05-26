@@ -27,7 +27,7 @@ export function LeadCaptureModal({
   // Delay before showing — let users read their results first
   useEffect(() => {
     // Don't show again if they've already submitted in this session
-    if (sessionStorage.getItem(`lead-captured-${slug}`)) return
+    if (localStorage.getItem(`lead-captured-${slug}`)) return
 
     const timer = setTimeout(() => setVisible(true), 3000)
     return () => clearTimeout(timer)
@@ -64,7 +64,7 @@ export function LeadCaptureModal({
       }
 
       setSubmitted(true)
-      sessionStorage.setItem(`lead-captured-${slug}`, 'true')
+      localStorage.setItem(`lead-captured-${slug}`, 'true')
 
     } catch {
       setError('Network error. Please try again.')
